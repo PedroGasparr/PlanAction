@@ -1,0 +1,3236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Planos de Ação</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Sistema de Login -->
+    <div id="login-section" class="login-container">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Login</h4>
+            </div>
+            <div class="card-body">
+                <form id="login-form">
+                    <div class="mb-3">
+                        <label for="login-email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="login-email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="login-password" class="form-label">Senha</label>
+                        <input type="password" class="form-control" id="login-password" required>
+                        <div class="form-text">
+                            <a href="#" id="forgot-password-link">Esqueci minha senha</a>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Entrar</button>
+                </form>
+                <div class="mt-3 text-center">
+                    <button id="register-btn" class="btn btn-link">Criar nova conta</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de registro -->
+    <div class="modal fade" id="register-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Criar Nova Conta</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="register-form">
+                        <div class="mb-3">
+                            <label for="register-name" class="form-label">Nome Completo</label>
+                            <input type="text" class="form-control" id="register-name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="register-email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-password" class="form-label">Senha</label>
+                            <input type="password" class="form-control" id="register-password" minlength="8" required>
+                            <div class="password-strength strength-0" id="password-strength"></div>
+                            <div class="form-text">Mínimo 8 caracteres (letras, números e símbolos)</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-confirm-password" class="form-label">Confirmar Senha</label>
+                            <input type="password" class="form-control" id="register-confirm-password" minlength="8" required>
+                        </div>
+                        <div class="mb-3" id="admin-code-container" style="display: none;">
+                            <label for="admin-code" class="form-label">Código de Administrador</label>
+                            <input type="password" class="form-control" id="admin-code" placeholder="Digite o código secreto para admin">
+                        </div>
+                        <div class="mb-3">
+                            <label for="register-user-type" class="form-label">Tipo de Usuário</label>
+                            <select class="form-select" id="register-user-type" required>
+                                <option value="normal">Usuário Normal</option>
+                                <option value="admin">Administrador</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Registrar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de recuperação de senha -->
+    <div class="modal fade" id="reset-password-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Recuperação de Senha</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="reset-password-form">
+                        <div class="mb-3">
+                            <label for="reset-email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="reset-email" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Enviar Link de Recuperação</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sistema Principal (após login) -->
+    <div id="app-container" class="d-none">
+        <div class="d-flex">
+            <!-- Sidebar -->
+            <div class="sidebar p-3" style="width: 250px;">
+                <h4 class="text-center mb-4">Gestor de Planos</h4>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-section="dashboard">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-section="create-plan">
+                            <i class="bi bi-file-earmark-plus"></i> Criar Plano
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-section="view-plans">
+                            <i class="bi bi-list-check"></i> Planos Criados
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-section="view-actions">
+                            <i class="bi bi-card-checklist"></i> Ações dos Planos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-section="manage-actions">
+                            <i class="bi bi-gear"></i> Gerenciar Ações
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-section="settings">
+                            <i class="bi bi-envelope"></i> Notificações
+                            <span id="notification-badge" class="badge bg-danger notification-badge d-none">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item d-none" id="admin-menu-item">
+                        <a class="nav-link" href="#" data-section="admin">
+                            <i class="bi bi-shield-lock"></i> Administração
+                            <span id="admin-badge" class="badge bg-danger notification-badge d-none">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item mt-4">
+                        <a class="nav-link text-danger" href="#" id="logout-btn">
+                            <i class="bi bi-box-arrow-right"></i> Sair
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Conteúdo Principal -->
+            <div class="main-content flex-grow-1">
+                <!-- Dashboard -->
+                <div id="dashboard-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2>Dashboard</h2>
+                        <div class="d-flex gap-2">
+                            <div class="form-group">
+                                <select id="dashboard-area-filter" class="form-select form-select-sm">
+                                    <option value="">Todas as Áreas</option>
+                                    <option value="Segurança do Trabalho">Segurança do Trabalho</option>
+                                    <option value="Gerência">Gerência</option>
+                                    <option value="Coordenação">Coordenação</option>
+                                    <option value="Limpeza">Limpeza</option>
+                                    <option value="Operação">Operação</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <select id="dashboard-unit-filter" class="form-select form-select-sm">
+                                    <option value="">Todas as Unidades</option>
+                                    <option value="Fábrica Belém">Fábrica Belém</option>
+                                    <option value="Fábrica Suzano">Fábrica Suzano</option>
+                                    <option value="Fábrica Suzano Mogi Das Cruzes">Fábrica Suzano Mogi Das Cruzes</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <select id="dashboard-plan-filter" class="form-select form-select-sm">
+                                    <option value="">Todos os Planos</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="card dashboard-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Progresso Total</h5>
+                                    <div class="progress mt-3">
+                                        <div id="total-progress" class="progress-bar" role="progressbar" style="width: 0%">0%</div>
+                                    </div>
+                                    <p class="mt-2 mb-0 text-muted">Conclusão geral de todos os planos</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card dashboard-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Planos Ativos</h5>
+                                    <h2 id="active-plans-count" class="display-6">0</h2>
+                                    <p class="mb-0 text-muted">Planos em andamento</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card dashboard-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Ações Pendentes</h5>
+                                    <h2 id="pending-actions-count" class="display-6">0</h2>
+                                    <p class="mb-0 text-muted">Ações não concluídas</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card dashboard-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Ações Atrasadas</h5>
+                                    <h2 id="late-actions-count" class="display-6">0</h2>
+                                    <p class="mb-0 text-muted">Ações fora do prazo</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Planos por Status</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="plans-status-chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">Ações por Prioridade</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="actions-priority-chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">Ações por Responsável</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="actions-responsible-chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">Status das Ações</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="chart-container">
+                                        <canvas id="actions-status-chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Criar Plano de Ação -->
+                <div id="create-plan-section" class="d-none">
+                    <h2 class="mb-4">Criar Novo Plano de Ação</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <form id="action-plan-form">
+                                <div class="form-section">
+                                    <h5 class="form-title">Informações Básicas do Plano</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label for="plan-title" class="form-label">Título do Plano*</label>
+                                            <input type="text" class="form-control" id="plan-title" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="plan-type" class="form-label">Tipo*</label>
+                                            <select class="form-select" id="plan-type" required>
+                                                <option value="">Selecione...</option>
+                                                <option value="Estratégico">Estratégico</option>
+                                                <option value="Tático">Tático</option>
+                                                <option value="Operacional">Operacional</option>
+                                                <option value="Melhoria">Melhoria</option>
+                                                <option value="Corretivo">Corretivo</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-6">
+                                            <label for="plan-area" class="form-label">Área*</label>
+                                            <select class="form-select" id="plan-area" required>
+                                                <option value="">Selecione...</option>
+                                                <option value="Segurança do Trabalho">Segurança do Trabalho</option>
+                                                <option value="Gerência">Gerência</option>
+                                                <option value="Coordenação">Coordenação</option>
+                                                <option value="Limpeza">Limpeza</option>
+                                                <option value="Operação">Operação</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="plan-unit" class="form-label">Unidade*</label>
+                                            <select class="form-select" id="plan-unit" required>
+                                                <option value="">Selecione...</option>
+                                                <option value="Fábrica Belém">Fábrica Belém</option>
+                                                <option value="Fábrica Suzano">Fábrica Suzano</option>
+                                                <option value="Fábrica Suzano Mogi Das Cruzes">Fábrica Suzano Mogi Das Cruzes</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-3">
+                                        <div class="col-md-12">
+                                            <label for="plan-description" class="form-label">Descrição do Plano</label>
+                                            <textarea class="form-control" id="plan-description" rows="3"></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-section mt-4">
+                                    <h5 class="form-title">Adicionar Ações ao Plano*</h5>
+                                    <div id="action-items-container">
+                                        <!-- Ações serão adicionadas aqui dinamicamente -->
+                                    </div>
+                                    <button type="button" id="add-action-btn" class="btn btn-secondary mt-3">
+                                        <i class="bi bi-plus-circle"></i> Adicionar Ação
+                                    </button>
+                                </div>
+
+                                <div class="text-end mt-4">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-save"></i> Salvar Plano de Ação
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualizar Planos Criados -->
+                <div id="view-plans-section" class="d-none">
+                    <h2 class="mb-4">Planos Criados</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <input type="text" id="search-plans-input" class="form-control" placeholder="Buscar planos...">
+                                </div>
+                                <div class="col-md-3">
+                                    <select id="plans-area-filter" class="form-select">
+                                        <option value="">Todas as Áreas</option>
+                                        <option value="Segurança do Trabalho">Segurança do Trabalho</option>
+                                        <option value="Gerência">Gerência</option>
+                                        <option value="Coordenação">Coordenação</option>
+                                        <option value="Limpeza">Limpeza</option>
+                                        <option value="Operação">Operação</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select id="plans-unit-filter" class="form-select">
+                                        <option value="">Todas as Unidades</option>
+                                        <option value="Fábrica Belém">Fábrica Belém</option>
+                                        <option value="Fábrica Suzano">Fábrica Suzano</option>
+                                        <option value="Fábrica Suzano Mogi Das Cruzes">Fábrica Suzano Mogi Das Cruzes</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Título</th>
+                                            <th>Área</th>
+                                            <th>Unidade</th>
+                                            <th>Tipo</th>
+                                            <th>Data Criação</th>
+                                            <th>Progresso</th>
+                                            <th>Status</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="plans-table-body">
+                                        <!-- Planos serão carregados aqui -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visualizar Ações dos Planos -->
+                <div id="view-actions-section" class="d-none">
+                    <h2 class="mb-4">Ações dos Planos</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="mb-3 row">
+                                <div class="col-md-4">
+                                    <label for="plan-filter" class="form-label">Filtrar por Plano:</label>
+                                    <select id="plan-filter" class="form-select">
+                                        <option value="">Todos os Planos</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="action-status-filter" class="form-label">Filtrar por Status:</label>
+                                    <select id="action-status-filter" class="form-select">
+                                        <option value="">Todos</option>
+                                        <option value="Não Iniciado">Não Iniciado</option>
+                                        <option value="Em Andamento">Em Andamento</option>
+                                        <option value="Concluído">Concluído</option>
+                                        <option value="Cancelado">Cancelado</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="action-area-filter" class="form-label">Filtrar por Área:</label>
+                                    <select id="action-area-filter" class="form-select">
+                                        <option value="">Todas as Áreas</option>
+                                        <option value="Segurança do Trabalho">Segurança do Trabalho</option>
+                                        <option value="Gerência">Gerência</option>
+                                        <option value="Coordenação">Coordenação</option>
+                                        <option value="Limpeza">Limpeza</option>
+                                        <option value="Operação">Operação</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <div class="col-md-6">
+                                    <input type="text" id="search-actions-input" class="form-control" placeholder="Buscar ações...">
+                                </div>
+                                <div class="col-md-6">
+                                    <select id="action-unit-filter" class="form-select">
+                                        <option value="">Todas as Unidades</option>
+                                        <option value="Fábrica Belém">Fábrica Belém</option>
+                                        <option value="Fábrica Suzano">Fábrica Suzano</option>
+                                        <option value="Fábrica Suzano Mogi Das Cruzes">Fábrica Suzano Mogi Das Cruzes</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Plano</th>
+                                            <th>Área</th>
+                                            <th>Unidade</th>
+                                            <th>Objetivo</th>
+                                            <th>Atividade</th>
+                                            <th>Responsável</th>
+                                            <th>Status</th>
+                                            <th>Prazo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="actions-table-body">
+                                        <!-- Ações serão carregadas aqui -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gerenciar Ações -->
+                <div id="manage-actions-section" class="d-none">
+                    <h2 class="mb-4">Gerenciar Ações</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="mb-3 row">
+                                <div class="col-md-4">
+                                    <label for="manage-plan-filter" class="form-label">Filtrar por Plano:</label>
+                                    <select id="manage-plan-filter" class="form-select">
+                                        <option value="">Todos os Planos</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="status-filter" class="form-label">Filtrar por Status:</label>
+                                    <select id="status-filter" class="form-select">
+                                        <option value="">Todos</option>
+                                        <option value="Não Iniciado">Não Iniciado</option>
+                                        <option value="Em Andamento">Em Andamento</option>
+                                        <option value="Concluído">Concluído</option>
+                                        <option value="Cancelado">Cancelado</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="manage-area-filter" class="form-label">Filtrar por Área:</label>
+                                    <select id="manage-area-filter" class="form-select">
+                                        <option value="">Todas as Áreas</option>
+                                        <option value="Segurança do Trabalho">Segurança do Trabalho</option>
+                                        <option value="Gerência">Gerência</option>
+                                        <option value="Coordenação">Coordenação</option>
+                                        <option value="Limpeza">Limpeza</option>
+                                        <option value="Operação">Operação</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mb-3 row">
+                                <div class="col-md-6">
+                                    <input type="text" id="search-manage-actions-input" class="form-control" placeholder="Buscar ações...">
+                                </div>
+                                <div class="col-md-6">
+                                    <select id="manage-unit-filter" class="form-select">
+                                        <option value="">Todas as Unidades</option>
+                                        <option value="Fábrica Belém">Fábrica Belém</option>
+                                        <option value="Fábrica Suzano">Fábrica Suzano</option>
+                                        <option value="Fábrica Suzano Mogi Das Cruzes">Fábrica Suzano Mogi Das Cruzes</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="manage-actions-container">
+                                <!-- Ações para gerenciamento serão carregadas aqui -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configurações de Notificação -->
+                <div id="settings-section" class="d-none">
+                    <h2 class="mb-4">Configurações de Notificação</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Cadastro de Emails para Notificação</h5>
+                            
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> Os emails cadastrados abaixo receberão notificações diárias sobre ações atrasadas.
+                            </div>
+                            
+                            <form id="notification-form" class="mb-4">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <label for="notification-email" class="form-label">Email para Notificação</label>
+                                        <input type="email" class="form-control" id="notification-email" placeholder="Digite o email que receberá notificações" required>
+                                    </div>
+                                    <div class="col-md-4 d-flex align-items-end">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="bi bi-plus-circle"></i> Adicionar
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                            
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Email</th>
+                                            <th>Data de Cadastro</th>
+                                            <th>Ações</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="notification-emails-table">
+                                        <!-- Emails serão carregados aqui -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h5 class="card-title mb-3">Configurações de Envio</h5>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="enable-notifications" checked>
+                                    <label class="form-check-label" for="enable-notifications">Ativar notificações por email</label>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label for="notification-time" class="form-label">Horário de Envio</label>
+                                        <select class="form-select" id="notification-time">
+                                            <option value="08:00">08:00</option>
+                                            <option value="09:00" selected>09:00</option>
+                                            <option value="10:00">10:00</option>
+                                            <option value="17:00">17:00</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6 d-flex align-items-end">
+                                        <button id="save-notification-settings" class="btn btn-success w-100">
+                                            <i class="bi bi-save"></i> Salvar Configurações
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <button id="test-notification-btn" class="btn btn-outline-primary">
+                                    <i class="bi bi-envelope"></i> Enviar Email de Teste
+                                </button>
+                                <small class="text-muted ms-2">Envia um email de teste para todos os cadastrados</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu de Administração -->
+                <div id="admin-section" class="d-none">
+                    <h2 class="mb-4">Administração</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="pending-requests-tab" data-bs-toggle="tab" data-bs-target="#pending-requests" type="button" role="tab">
+                                        Solicitações Pendentes <span id="pending-requests-badge" class="badge bg-danger ms-1">0</span>
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+                                        Usuários
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="logs-tab" data-bs-toggle="tab" data-bs-target="#logs" type="button" role="tab">
+                                        Logs do Sistema
+                                    </button>
+                                </li>
+                            </ul>
+                            
+                            <div class="tab-content mt-3" id="adminTabsContent">
+                                <div class="tab-pane fade show active" id="pending-requests" role="tabpanel">
+                                    <div id="admin-requests-container">
+                                        <!-- Solicitações pendentes serão carregadas aqui -->
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="users" role="tabpanel">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Nome</th>
+                                                    <th>Email</th>
+                                                    <th>Tipo de Usuário</th>
+                                                    <th>Último Acesso</th>
+                                                    <th>Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="users-table-body">
+                                                <!-- Usuários serão carregados aqui -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="logs" role="tabpanel">
+                                    <div class="table-responsive">
+                                        <table class="table table-hover">
+                                            <thead>
+                                                <tr>
+                                                    <th>Data/Hora</th>
+                                                    <th>Usuário</th>
+                                                    <th>Ação</th>
+                                                    <th>Detalhes</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="logs-table-body">
+                                                <!-- Logs serão carregados aqui -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Template para uma ação (usado pelo JavaScript) -->
+                <template id="action-item-template">
+                    <div class="action-item-form mb-4 p-3 border rounded">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <label class="form-label">Objetivo Estratégico</label>
+                                <input type="text" class="form-control objective" required>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <label class="form-label">Atividade</label>
+                                <input type="text" class="form-control activity" required>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <label class="form-label">Why - Porque?</label>
+                                <textarea class="form-control why" rows="2" required></textarea>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <label class="form-label">How - Como?</label>
+                                <textarea class="form-control how" rows="2" required></textarea>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Responsável</label>
+                                <input type="text" class="form-control responsible" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Executor</label>
+                                <input type="text" class="form-control executor" required>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Data Início</label>
+                                <input type="date" class="form-control start-date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Data Fim</label>
+                                <input type="date" class="form-control end-date" required>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-12">
+                                <label class="form-label">Where - Onde?</label>
+                                <input type="text" class="form-control where" required>
+                            </div>
+                        </div>
+                        <div class="row mt-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Prioridade</label>
+                                <select class="form-select priority">
+                                    <option value="Baixa">Baixa</option>
+                                    <option value="Média" selected>Média</option>
+                                    <option value="Alta">Alta</option>
+                                    <option value="Crítica">Crítica</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Status</label>
+                                <select class="form-select status">
+                                    <option value="Não Iniciado">Não Iniciado</option>
+                                    <option value="Em Andamento">Em Andamento</option>
+                                    <option value="Concluído">Concluído</option>
+                                    <option value="Cancelado">Cancelado</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="text-end mt-2">
+                            <button type="button" class="btn btn-sm btn-danger remove-action-btn">
+                                <i class="bi bi-trash"></i> Remover
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para visualizar/editar plano -->
+    <div class="modal fade" id="plan-details-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="plan-details-title">Detalhes do Plano</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <h6>Informações do Plano</h6>
+                        <p><strong>Título:</strong> <span id="modal-plan-title"></span></p>
+                        <p><strong>Tipo:</strong> <span id="modal-plan-type"></span></p>
+                        <p><strong>Área:</strong> <span id="modal-plan-area"></span></p>
+                        <p><strong>Unidade:</strong> <span id="modal-plan-unit"></span></p>
+                        <p><strong>Descrição:</strong> <span id="modal-plan-description"></span></p>
+                        <p><strong>Progresso:</strong> 
+                            <div class="progress">
+                                <div id="modal-plan-progress" class="progress-bar" role="progressbar" style="width: 0%">0%</div>
+                            </div>
+                        </p>
+                        <div class="d-flex justify-content-end mt-2">
+                            <button id="complete-plan-btn" class="btn btn-success me-2">Marcar como Concluído</button>
+                            <button id="cancel-plan-btn" class="btn btn-danger">Cancelar Plano</button>
+                        </div>
+                    </div>
+                    <hr>
+                    <h6 class="mb-3">Ações do Plano</h6>
+                    <div id="modal-actions-container">
+                        <!-- Ações do plano serão carregadas aqui -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para enviar evidência -->
+    <div class="modal fade" id="evidence-modal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Enviar Evidência</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="evidence-form">
+                        <input type="hidden" id="evidence-plan-id">
+                        <input type="hidden" id="evidence-action-index">
+                        <div class="mb-3">
+                            <label for="evidence-comments" class="form-label">Comentários</label>
+                            <textarea class="form-control" id="evidence-comments" rows="3"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="evidence-image" class="form-label">Imagem de Evidência</label>
+                            <input type="file" class="form-control" id="evidence-image" accept="image/*">
+                        </div>
+                        <div id="evidence-preview" class="text-center mb-3 d-none">
+                            <img id="evidence-preview-image" class="evidence-image" src="#" alt="Pré-visualização da evidência">
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-primary">Enviar Evidência</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>  
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script type="text/javascript">
+        emailjs.init("lYRk8TyBCvr1Kx0Hx");
+    </script>        
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyAkFlGBKrXhgpAtxaJBuV2AweWoIA9VzmU",
+            authDomain: "planaction-fb5c5.firebaseapp.com",
+            databaseURL: "https://planaction-fb5c5-default-rtdb.firebaseio.com",
+            projectId: "planaction-fb5c5",
+            storageBucket: "planaction-fb5c5.appspot.com",
+            messagingSenderId: "977704616512",
+            appId: "1:977704616512:web:d0257d0ee1a76258fcd5a5",
+            measurementId: "G-6WWK67L89X"
+        };
+
+        // Inicializar Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        const ADMIN_SECRET_CODE = "admin@&locker#0945";
+
+        // Variáveis globais
+        let currentUser = null;
+        let userData = null;
+        let plansChart = null;
+        let actionsChart = null;
+        let responsibleChart = null;
+        let actionsStatusChart = null;
+        let notificationCheckInterval = null;
+        let adminCheckInterval = null;
+        const evidenceModal = new bootstrap.Modal(document.getElementById('evidence-modal'));
+        const registerModal = new bootstrap.Modal(document.getElementById('register-modal'));
+        const resetPasswordModal = new bootstrap.Modal(document.getElementById('reset-password-modal'));
+
+        // Aguardar o DOM estar pronto
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos da interface
+            const loginSection = document.getElementById('login-section');
+            const appContainer = document.getElementById('app-container');
+            const loginForm = document.getElementById('login-form');
+            const registerBtn = document.getElementById('register-btn');
+            const registerForm = document.getElementById('register-form');
+            const registerUserType = document.getElementById('register-user-type');
+            const adminCodeContainer = document.getElementById('admin-code-container');
+            const forgotPasswordLink = document.getElementById('forgot-password-link');
+            const resetPasswordForm = document.getElementById('reset-password-form');
+            const logoutBtn = document.getElementById('logout-btn');
+            const addActionBtn = document.getElementById('add-action-btn');
+            const actionItemsContainer = document.getElementById('action-items-container');
+            const actionItemTemplate = document.getElementById('action-item-template');
+            const actionPlanForm = document.getElementById('action-plan-form');
+            const plansTableBody = document.getElementById('plans-table-body');
+            const actionsTableBody = document.getElementById('actions-table-body');
+            const manageActionsContainer = document.getElementById('manage-actions-container');
+            const planFilter = document.getElementById('plan-filter');
+            const managePlanFilter = document.getElementById('manage-plan-filter');
+            const statusFilter = document.getElementById('status-filter');
+            const actionStatusFilter = document.getElementById('action-status-filter');
+            const dashboardPlanFilter = document.getElementById('dashboard-plan-filter');
+            const dashboardAreaFilter = document.getElementById('dashboard-area-filter');
+            const dashboardUnitFilter = document.getElementById('dashboard-unit-filter');
+            const plansAreaFilter = document.getElementById('plans-area-filter');
+            const plansUnitFilter = document.getElementById('plans-unit-filter');
+            const actionAreaFilter = document.getElementById('action-area-filter');
+            const actionUnitFilter = document.getElementById('action-unit-filter');
+            const manageAreaFilter = document.getElementById('manage-area-filter');
+            const manageUnitFilter = document.getElementById('manage-unit-filter');
+            const searchPlansInput = document.getElementById('search-plans-input');
+            const searchActionsInput = document.getElementById('search-actions-input');
+            const searchManageActionsInput = document.getElementById('search-manage-actions-input');
+            const planDetailsModal = new bootstrap.Modal(document.getElementById('plan-details-modal'));
+            const completePlanBtn = document.getElementById('complete-plan-btn');
+            const cancelPlanBtn = document.getElementById('cancel-plan-btn');
+            const evidenceForm = document.getElementById('evidence-form');
+            const evidenceImageInput = document.getElementById('evidence-image');
+            const evidencePreview = document.getElementById('evidence-preview');
+            const evidencePreviewImage = document.getElementById('evidence-preview-image');
+            const adminMenuItem = document.getElementById('admin-menu-item');
+            const adminRequestsContainer = document.getElementById('admin-requests-container');
+            const pendingRequestsBadge = document.getElementById('pending-requests-badge');
+            const usersTableBody = document.getElementById('users-table-body');
+            const logsTableBody = document.getElementById('logs-table-body');
+            const passwordStrength = document.getElementById('password-strength');
+            const registerPassword = document.getElementById('register-password');
+            
+            // Elementos de notificação
+            const notificationForm = document.getElementById('notification-form');
+            const notificationEmailInput = document.getElementById('notification-email');
+            const notificationEmailsTable = document.getElementById('notification-emails-table');
+            const enableNotifications = document.getElementById('enable-notifications');
+            const notificationTime = document.getElementById('notification-time');
+            const saveNotificationSettings = document.getElementById('save-notification-settings');
+            const testNotificationBtn = document.getElementById('test-notification-btn');
+            const notificationBadge = document.getElementById('notification-badge');
+
+            // Navegação entre seções
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.getAttribute('data-section');
+                    showSection(section);
+                    
+                    // Atualizar badge de notificação
+                    if (section === 'settings') {
+                        updateNotificationBadge(0);
+                    }
+                    if (section === 'admin') {
+                        updateAdminBadge(0);
+                    }
+                });
+            });
+            registerBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    registerModal.show();
+});
+
+            // Mostrar seção específica
+            function showSection(section) {
+                document.querySelectorAll('.main-content > div').forEach(div => {
+                    div.classList.add('d-none');
+                });
+                document.querySelector(`.nav-link[data-section="${section}"]`).classList.add('active');
+                document.querySelectorAll(`.nav-link:not([data-section="${section}"])`).forEach(link => {
+                    link.classList.remove('active');
+                });
+                document.getElementById(`${section}-section`).classList.remove('d-none');
+                
+                // Carregar dados específicos da seção
+                if (section === 'dashboard') {
+                    loadDashboardData();
+                } else if (section === 'view-plans') {
+                    loadPlansTable();
+                } else if (section === 'view-actions') {
+                    loadActionsTable();
+                } else if (section === 'manage-actions') {
+                    loadManageActions();
+                } else if (section === 'settings') {
+                    loadNotificationSettings();
+                } else if (section === 'admin') {
+                    loadAdminRequests();
+                    loadUsersTable();
+                    loadSystemLogs();
+                }
+            }
+
+            // Mostrar/ocultar campo de código admin
+            registerUserType.addEventListener('change', function() {
+                adminCodeContainer.style.display = this.value === 'admin' ? 'block' : 'none';
+            });
+
+            // Verificar força da senha
+            registerPassword.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                
+                // Verificar comprimento
+                if (password.length >= 8) strength++;
+                // Verificar letras maiúsculas
+                if (/[A-Z]/.test(password)) strength++;
+                // Verificar números
+                if (/[0-9]/.test(password)) strength++;
+                // Verificar caracteres especiais
+                if (/[^A-Za-z0-9]/.test(password)) strength++;
+                
+                // Atualizar visualização
+                passwordStrength.className = 'password-strength strength-' + strength;
+            });
+
+            // Registrar nova conta
+            registerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const name = document.getElementById('register-name').value;
+                const email = document.getElementById('register-email').value;
+                const password = document.getElementById('register-password').value;
+                const confirmPassword = document.getElementById('register-confirm-password').value;
+                const userType = document.getElementById('register-user-type').value;
+                const adminCode = document.getElementById('admin-code')?.value;
+
+                // Validações
+                if (password !== confirmPassword) {
+                    alert('As senhas não coincidem!');
+                    return;
+                }
+
+                if (userType === 'admin' && adminCode !== ADMIN_SECRET_CODE) {
+                    alert('Código de administrador inválido!');
+                    return;
+                }
+
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Criando conta...';
+
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        const user = userCredential.user;
+                        return database.ref('users/' + user.uid).set({
+                            name: name,
+                            email: email,
+                            userType: userType,
+                            isAdmin: userType === 'admin',
+                            createdAt: firebase.database.ServerValue.TIMESTAMP,
+                            lastLogin: null
+                        });
+                    })
+                    .then(() => {
+                        alert('Conta criada com sucesso!');
+                        registerModal.hide();
+                        registerForm.reset();
+                        passwordStrength.className = 'password-strength strength-0';
+                    })
+                    .catch((error) => {
+                        alert('Erro ao criar conta: ' + error.message);
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Registrar';
+                    });
+            });
+
+            // Recuperação de senha
+            forgotPasswordLink.addEventListener('click', function(e) {
+                e.preventDefault();
+                resetPasswordModal.show();
+            });
+
+            resetPasswordForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('reset-email').value;
+                
+                const submitBtn = this.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enviando...';
+
+                auth.sendPasswordResetEmail(email)
+                    .then(() => {
+                        alert('Email de recuperação enviado com sucesso! Verifique sua caixa de entrada.');
+                        resetPasswordModal.hide();
+                        resetPasswordForm.reset();
+                    })
+                    .catch((error) => {
+                        alert('Erro ao enviar email de recuperação: ' + error.message);
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Enviar Link de Recuperação';
+                    });
+            });
+
+            // Login
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const email = document.getElementById('login-email').value;
+                const password = document.getElementById('login-password').value;
+
+                const submitBtn = loginForm.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Entrando...';
+
+                auth.signInWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        currentUser = userCredential.user;
+                        return database.ref('users/' + currentUser.uid).once('value');
+                    })
+                    .then((snapshot) => {
+                        if (!snapshot.exists()) {
+                            throw new Error('Dados do usuário não encontrados');
+                        }
+                        
+                        userData = snapshot.val();
+                        
+                        // Atualizar último login
+                        return database.ref('users/' + currentUser.uid).update({
+                            lastLogin: firebase.database.ServerValue.TIMESTAMP
+                        });
+                    })
+                    .then(() => {
+                        // Registrar log de login
+                        return database.ref('system_logs').push().set({
+                            type: 'login',
+                            userId: currentUser.uid,
+                            userEmail: currentUser.email,
+                            userName: userData.name,
+                            timestamp: firebase.database.ServerValue.TIMESTAMP,
+                            details: 'Login realizado com sucesso'
+                        });
+                    })
+                    .then(() => {
+                        loginSection.classList.add('d-none');
+                        appContainer.classList.remove('d-none');
+                        showSection('dashboard');
+                        
+                        // Verificar se é admin
+                        if (userData.userType === 'admin' || userData.isAdmin) {
+                            adminMenuItem.classList.remove('d-none');
+                            startAdminCheck();
+                        }
+                        
+                        // Carregar dados necessários após login
+                        loadDashboardPlanFilter();
+                        startNotificationCheck();
+                    })
+                    .catch((error) => {
+                        console.error('Erro no login:', error);
+                        alert('Erro ao fazer login: ' + error.message);
+                        auth.signOut();
+                    })
+                    .finally(() => {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Entrar';
+                    });
+            });
+
+            // Logout
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Registrar log de logout
+                database.ref('system_logs').push().set({
+                    type: 'logout',
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    userName: userData.name,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    details: 'Logout realizado'
+                })
+                .then(() => {
+                    return auth.signOut();
+                })
+                .then(() => {
+                    currentUser = null;
+                    userData = null;
+                    appContainer.classList.add('d-none');
+                    loginSection.classList.remove('d-none');
+                    loginForm.reset();
+                    
+                    // Parar verificações
+                    stopNotificationCheck();
+                    stopAdminCheck();
+                })
+                .catch((error) => {
+                    alert('Erro ao fazer logout: ' + error.message);
+                });
+            });
+
+            // Adicionar ação ao formulário
+            addActionBtn.addEventListener('click', function() {
+                const actionItem = actionItemTemplate.content.cloneNode(true);
+                const removeBtn = actionItem.querySelector('.remove-action-btn');
+                removeBtn.addEventListener('click', function() {
+                    this.closest('.action-item-form').remove();
+                });
+                actionItemsContainer.appendChild(actionItem);
+            });
+
+            // Salvar plano de ação
+            actionPlanForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (!currentUser) return;
+
+                const title = document.getElementById('plan-title').value;
+                const type = document.getElementById('plan-type').value;
+                const area = document.getElementById('plan-area').value;
+                const unit = document.getElementById('plan-unit').value;
+                const description = document.getElementById('plan-description').value;
+                const actionItems = [];
+
+                document.querySelectorAll('.action-item-form').forEach(item => {
+                    actionItems.push({
+                        objective: item.querySelector('.objective').value,
+                        activity: item.querySelector('.activity').value,
+                        why: item.querySelector('.why').value,
+                        how: item.querySelector('.how').value,
+                        responsible: item.querySelector('.responsible').value,
+                        executor: item.querySelector('.executor').value,
+                        startDate: item.querySelector('.start-date').value,
+                        endDate: item.querySelector('.end-date').value,
+                        where: item.querySelector('.where').value,
+                        priority: item.querySelector('.priority').value,
+                        status: item.querySelector('.status').value,
+                        completed: false,
+                        evidence: null
+                    });
+                });
+
+                if (actionItems.length === 0) {
+                    alert('Adicione pelo menos uma ação ao plano!');
+                    return;
+                }
+
+                const submitBtn = actionPlanForm.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Salvando...';
+
+                const planRef = database.ref('plans').push();
+                planRef.set({
+                    title: title,
+                    type: type,
+                    area: area,
+                    unit: unit,
+                    description: description,
+                    createdAt: firebase.database.ServerValue.TIMESTAMP,
+                    createdBy: currentUser.uid,
+                    createdByName: userData.name,
+                    actions: actionItems,
+                    status: 'Ativo'
+                })
+                .then(() => {
+                    // Registrar log
+                    return database.ref('system_logs').push().set({
+                        type: 'plan_created',
+                        userId: currentUser.uid,
+                        userEmail: currentUser.email,
+                        userName: userData.name,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP,
+                        details: `Plano "${title}" criado com ${actionItems.length} ações`,
+                        planId: planRef.key
+                    });
+                })
+                .then(() => {
+                    alert('Plano de ação salvo com sucesso!');
+                    actionPlanForm.reset();
+                    actionItemsContainer.innerHTML = '';
+                    showSection('view-plans');
+                })
+                .catch((error) => {
+                    alert('Erro ao salvar plano: ' + error.message);
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-save"></i> Salvar Plano de Ação';
+                });
+            });
+
+            // Carregar dados do dashboard
+            function loadDashboardData() {
+                if (!currentUser) return;
+
+                const planFilterValue = dashboardPlanFilter.value;
+                const areaFilterValue = dashboardAreaFilter.value;
+                const unitFilterValue = dashboardUnitFilter.value;
+
+                let query = database.ref('plans');
+                
+                query.once('value')
+                    .then((snapshot) => {
+                        const plans = [];
+                        let totalActions = 0;
+                        let completedActions = 0;
+                        let activePlans = 0;
+                        let pendingActions = 0;
+                        let lateActions = 0;
+                        const today = new Date();
+
+                        snapshot.forEach(planSnapshot => {
+                            const plan = planSnapshot.val();
+                            plan.id = planSnapshot.key;
+                            
+                            // Filtrar por plano selecionado
+                            if (planFilterValue && planSnapshot.key !== planFilterValue) return;
+                            
+                            // Filtrar por área selecionada
+                            if (areaFilterValue && plan.area !== areaFilterValue) return;
+                            
+                            // Filtrar por unidade selecionada
+                            if (unitFilterValue && plan.unit !== unitFilterValue) return;
+                            
+                            plans.push(plan);
+
+                            if (plan.status === 'Ativo') activePlans++;
+
+                            if (plan.actions) {
+                                totalActions += plan.actions.length;
+                                completedActions += plan.actions.filter(action => action.status === 'Concluído').length;
+                                pendingActions += plan.actions.filter(action => action.status !== 'Concluído').length;
+                                
+                                // Verificar ações atrasadas
+                                plan.actions.forEach(action => {
+                                    if (action.status !== 'Concluído' && action.endDate) {
+                                        const endDate = new Date(action.endDate);
+                                        if (endDate < today) {
+                                            lateActions++;
+                                        }
+                                    }
+                                });
+                            }
+                        });
+
+                        // Atualizar contadores
+                        document.getElementById('active-plans-count').textContent = activePlans;
+                        document.getElementById('pending-actions-count').textContent = pendingActions;
+                        document.getElementById('late-actions-count').textContent = lateActions;
+                        
+                        // Atualizar progresso total
+                        const totalProgress = totalActions > 0 ? Math.round((completedActions / totalActions) * 100) : 0;
+                        const totalProgressBar = document.getElementById('total-progress');
+                        totalProgressBar.style.width = totalProgress + '%';
+                        totalProgressBar.textContent = totalProgress + '%';
+
+                        // Criar/atualizar gráficos
+                        updateCharts(plans);
+                    });
+            }
+
+            // Atualizar gráficos do dashboard
+            function updateCharts(plans) {
+                // Dados para gráfico de status dos planos
+                const planStatusCounts = {
+                    'Ativo': 0,
+                    'Concluído': 0,
+                    'Cancelado': 0
+                };
+
+                // Dados para gráfico de prioridade das ações
+                const actionPriorityCounts = {
+                    'Baixa': 0,
+                    'Média': 0,
+                    'Alta': 0,
+                    'Crítica': 0
+                };
+
+                // Dados para gráfico de status das ações
+                const actionStatusCounts = {
+                    'Não Iniciado': 0,
+                    'Em Andamento': 0,
+                    'Concluído': 0,
+                    'Cancelado': 0
+                };
+
+                // Dados para gráfico de ações por responsável
+                const responsibleCounts = {};
+
+                plans.forEach(plan => {
+                    planStatusCounts[plan.status] = (planStatusCounts[plan.status] || 0) + 1;
+
+                    if (plan.actions) {
+                        plan.actions.forEach(action => {
+                            actionPriorityCounts[action.priority] = (actionPriorityCounts[action.priority] || 0) + 1;
+                            actionStatusCounts[action.status] = (actionStatusCounts[action.status] || 0) + 1;
+                            
+                            // Contar ações por responsável
+                            if (action.responsible) {
+                                responsibleCounts[action.responsible] = (responsibleCounts[action.responsible] || 0) + 1;
+                            }
+                        });
+                    }
+                });
+
+                // Ordenar responsáveis por quantidade de ações (top 5)
+                const sortedResponsibles = Object.entries(responsibleCounts)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 5);
+
+                const responsibleLabels = sortedResponsibles.map(item => item[0]);
+                const responsibleData = sortedResponsibles.map(item => item[1]);
+
+                // Obter contexto dos canvases
+                const plansStatusCtx = document.getElementById('plans-status-chart').getContext('2d');
+                const actionsPriorityCtx = document.getElementById('actions-priority-chart').getContext('2d');
+                const actionsStatusCtx = document.getElementById('actions-status-chart').getContext('2d');
+                const responsibleCtx = document.getElementById('actions-responsible-chart').getContext('2d');
+
+                // Destruir gráficos existentes
+                if (plansChart) plansChart.destroy();
+                if (actionsChart) actionsChart.destroy();
+                if (actionsStatusChart) actionsStatusChart.destroy();
+                if (responsibleChart) responsibleChart.destroy();
+
+                // Criar gráfico de status dos planos
+                plansChart = new Chart(plansStatusCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(planStatusCounts),
+                        datasets: [{
+                            data: Object.values(planStatusCounts),
+                            backgroundColor: [
+                                '#007bff',
+                                '#28a745',
+                                '#dc3545'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const value = context.raw;
+                                        const percentage = Math.round((value / total) * 100);
+                                        return `${context.label}: ${value} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Criar gráfico de prioridade das ações
+                actionsChart = new Chart(actionsPriorityCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(actionPriorityCounts),
+                        datasets: [{
+                            label: 'Ações por Prioridade',
+                            data: Object.values(actionPriorityCounts),
+                            backgroundColor: [
+                                '#6c757d',
+                                '#17a2b8',
+                                '#ffc107',
+                                '#dc3545'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const value = context.raw;
+                                        const percentage = Math.round((value / total) * 100);
+                                        return `${context.label}: ${value} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Criar gráfico de status das ações
+                actionsStatusChart = new Chart(actionsStatusCtx, {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(actionStatusCounts),
+                        datasets: [{
+                            data: Object.values(actionStatusCounts),
+                            backgroundColor: [
+                                '#6c757d',
+                                '#007bff',
+                                '#28a745',
+                                '#dc3545'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const value = context.raw;
+                                        const percentage = Math.round((value / total) * 100);
+                                        return `${context.label}: ${value} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Criar gráfico de ações por responsável
+                // No código onde é criado o gráfico "Ações por Responsável", substitua a função atual por esta versão atualizada:
+
+// Criar gráfico de ações por responsável
+responsibleChart = new Chart(responsibleCtx, {
+    type: 'bar',
+    data: {
+        labels: responsibleLabels,
+        datasets: [
+            {
+                label: 'Total de Ações',
+                data: responsibleData,
+                backgroundColor: '#17a2b8'
+            },
+            {
+                label: 'Ações Atrasadas',
+                data: sortedResponsibles.map(item => {
+                    const responsible = item[0];
+                    let lateCount = 0;
+                    const today = new Date();
+                    
+                    plans.forEach(plan => {
+                        if (plan.actions) {
+                            plan.actions.forEach(action => {
+                                if (action.responsible === responsible && action.endDate) {
+                                    const endDate = new Date(action.endDate);
+                                    if (endDate < today && action.status !== 'Concluído') {
+                                        lateCount++;
+                                    }
+                                }
+                            });
+                        }
+                    });
+                    
+                    return lateCount;
+                }),
+                backgroundColor: '#dc3545'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: true,
+                stacked: false
+            },
+            x: {
+                stacked: false
+            }
+        },
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const total = plans.reduce((sum, plan) => sum + (plan.actions ? plan.actions.length : 0), 0);
+                        const value = context.raw;
+                        const percentage = Math.round((value / total) * 100);
+                        const datasetLabel = context.dataset.label;
+                        
+                        if (datasetLabel === 'Ações Atrasadas') {
+                            const responsible = context.label;
+                            const totalActions = responsibleData[context.dataIndex];
+                            const latePercentage = Math.round((value / totalActions) * 100);
+                            return `${datasetLabel}: ${value} (${latePercentage}% das ações deste responsável)`;
+                        }
+                        
+                        return `${datasetLabel}: ${value} (${percentage}% do total)`;
+                    }
+                }
+            }
+        }
+    }
+});
+            }
+
+            // Carregar planos para o filtro do dashboard
+            function loadDashboardPlanFilter() {
+                if (!currentUser) return;
+
+                dashboardPlanFilter.innerHTML = '<option value="">Todos os Planos</option>';
+
+                database.ref('plans').orderByChild('createdBy').equalTo(currentUser.uid).once('value')
+                    .then((snapshot) => {
+                        if (!snapshot.exists()) return;
+
+                        snapshot.forEach(planSnapshot => {
+                            const plan = planSnapshot.val();
+                            const option = document.createElement('option');
+                            option.value = planSnapshot.key;
+                            option.textContent = plan.title;
+                            dashboardPlanFilter.appendChild(option);
+                        });
+                    });
+            }
+
+            // Carregar tabela de planos
+            function loadPlansTable() {
+                if (!currentUser) return;
+
+                plansTableBody.innerHTML = '<tr><td colspan="8" class="text-center">Carregando...</td></tr>';
+
+                const areaFilterValue = plansAreaFilter.value;
+                const unitFilterValue = plansUnitFilter.value;
+                const searchText = searchPlansInput.value.toLowerCase();
+
+                let query = database.ref('plans');
+
+                query.once('value')
+                    .then((snapshot) => {
+                        plansTableBody.innerHTML = '';
+
+                        if (!snapshot.exists()) {
+                            plansTableBody.innerHTML = '<tr><td colspan="8" class="text-center">Nenhum plano encontrado</td></tr>';
+                            return;
+                        }
+
+                        // Atualizar filtros de planos
+                        planFilter.innerHTML = '<option value="">Todos os Planos</option>';
+                        managePlanFilter.innerHTML = '<option value="">Todos os Planos</option>';
+                        dashboardPlanFilter.innerHTML = '<option value="">Todos os Planos</option>';
+
+                        snapshot.forEach(planSnapshot => {
+                            const plan = planSnapshot.val();
+                            plan.id = planSnapshot.key;
+
+                            // Filtrar por área selecionada
+                            if (areaFilterValue && plan.area !== areaFilterValue) return;
+                            
+                            // Filtrar por unidade selecionada
+                            if (unitFilterValue && plan.unit !== unitFilterValue) return;
+                            
+                            // Filtrar por texto de busca
+                            if (searchText && !plan.title.toLowerCase().includes(searchText) && 
+                                !plan.description.toLowerCase().includes(searchText)) {
+                                return;
+                            }
+
+                            // Adicionar opção aos filtros
+                            const option = document.createElement('option');
+                            option.value = plan.id;
+                            option.textContent = plan.title;
+                            planFilter.appendChild(option.cloneNode(true));
+                            managePlanFilter.appendChild(option.cloneNode(true));
+                            dashboardPlanFilter.appendChild(option.cloneNode(true));
+
+                            // Calcular progresso
+                            let progress = 0;
+                            if (plan.actions && plan.actions.length > 0) {
+                                const completed = plan.actions.filter(a => a.status === 'Concluído').length;
+                                progress = Math.round((completed / plan.actions.length) * 100);
+                            }
+
+                            // Formatar data
+                            const createdAt = new Date(plan.createdAt);
+                            const dateStr = createdAt.toLocaleDateString('pt-BR');
+
+                            // Adicionar linha à tabela
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${plan.title}</td>
+                                <td>${plan.area}</td>
+                                <td>${plan.unit}</td>
+                                <td>${plan.type}</td>
+                                <td>${dateStr}</td>
+                                <td>
+                                    <div class="progress">
+                                        <div class="progress-bar" role="progressbar" style="width: ${progress}%">${progress}%</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge ${plan.status === 'Ativo' ? 'bg-primary' : plan.status === 'Concluído' ? 'bg-success' : 'bg-danger'}">
+                                        ${plan.status}
+                                    </span>
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-primary view-plan-btn" data-id="${plan.id}">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </td>
+                            `;
+                            plansTableBody.appendChild(row);
+                        });
+
+                        // Adicionar eventos aos botões de visualização
+                        document.querySelectorAll('.view-plan-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const planId = this.getAttribute('data-id');
+                                showPlanDetails(planId);
+                            });
+                        });
+                    });
+            }
+
+            // Mostrar detalhes do plano em um modal
+            function showPlanDetails(planId) {
+                database.ref('plans/' + planId).once('value')
+                    .then((snapshot) => {
+                        const plan = snapshot.val();
+                        if (!plan) return;
+
+                        // Preencher informações básicas do plano
+                        document.getElementById('modal-plan-title').textContent = plan.title;
+                        document.getElementById('modal-plan-type').textContent = plan.type;
+                        document.getElementById('modal-plan-area').textContent = plan.area;
+                        document.getElementById('modal-plan-unit').textContent = plan.unit;
+                        document.getElementById('modal-plan-description').textContent = plan.description || 'Nenhuma descrição fornecida';
+
+                        // Calcular e mostrar progresso
+                        let progress = 0;
+                        if (plan.actions && plan.actions.length > 0) {
+                            const completed = plan.actions.filter(a => a.status === 'Concluído').length;
+                            progress = Math.round((completed / plan.actions.length) * 100);
+                        }
+                        const progressBar = document.getElementById('modal-plan-progress');
+                        progressBar.style.width = progress + '%';
+                        progressBar.textContent = progress + '%';
+
+                        // Preencher ações do plano
+                        const actionsContainer = document.getElementById('modal-actions-container');
+                        actionsContainer.innerHTML = '';
+
+                        if (!plan.actions || plan.actions.length === 0) {
+                            actionsContainer.innerHTML = '<p>Nenhuma ação encontrada neste plano.</p>';
+                            return;
+                        }
+
+                        plan.actions.forEach((action, index) => {
+                            const actionElement = document.createElement('div');
+                            actionElement.className = `action-item mb-3 p-3 rounded ${action.status === 'Concluído' ? 'completed' : 
+                                                     action.status === 'Em Andamento' ? 'pending' : ''}`;
+                            
+                            // Verificar se a ação está atrasada
+                            const today = new Date();
+                            const endDate = new Date(action.endDate);
+                            const isLate = endDate < today && action.status !== 'Concluído';
+                            
+                            if (isLate) {
+                                actionElement.classList.add('late');
+                            }
+
+                            actionElement.innerHTML = `
+                                <h6>Ação ${index + 1}: ${action.activity}</h6>
+                                <p><strong>Objetivo Estratégico:</strong> ${action.objective}</p>
+                                <p><strong>Porque (Why):</strong> ${action.why}</p>
+                                <p><strong>Como (How):</strong> ${action.how}</p>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <p><strong>Responsável:</strong> ${action.responsible}</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p><strong>Executor:</strong> ${action.executor}</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p><strong>Onde (Where):</strong> ${action.where}</p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <p><strong>Início:</strong> ${formatDate(action.startDate)}</p>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <p><strong>Término:</strong> ${formatDate(action.endDate)} ${isLate ? '<span class="badge bg-danger">Atrasado</span>' : ''}</p>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p><strong>Prioridade:</strong> <span class="badge ${getPriorityBadgeClass(action.priority)}">${action.priority}</span></p>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <p><strong>Status:</strong> <span class="badge ${getStatusBadgeClass(action.status)}">${action.status}</span></p>
+                                    </div>
+                                </div>
+                                ${action.status === 'Concluído' && action.evidence ? `
+                                <div class="row mt-2">
+                                    <div class="col-md-12">
+                                        <p><strong>Evidência:</strong></p>
+                                        <p>${action.evidence.comments || 'Sem comentários'}</p>
+                                        <img src="${action.evidence.image}" class="evidence-image" alt="Evidência da ação">
+                                    </div>
+                                </div>
+                                ` : ''}
+                                ${action.status !== 'Concluído' ? `
+                                <div class="text-end mt-2">
+                                    <button class="btn btn-sm btn-success send-evidence-btn" 
+                                        data-plan-id="${planId}" 
+                                        data-action-index="${index}">
+                                        <i class="bi bi-check-circle"></i> Enviar Evidência
+                                    </button>
+                                </div>
+                                ` : ''}
+                                <hr>
+                            `;
+                            actionsContainer.appendChild(actionElement);
+                        });
+
+                        // Adicionar eventos aos botões de evidência
+                        document.querySelectorAll('.send-evidence-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const planId = this.getAttribute('data-plan-id');
+                                const actionIndex = this.getAttribute('data-action-index');
+                                
+                                document.getElementById('evidence-plan-id').value = planId;
+                                document.getElementById('evidence-action-index').value = actionIndex;
+                                evidenceModal.show();
+                            });
+                        });
+
+                        // Configurar botões de concluir/cancelar plano
+                        completePlanBtn.onclick = function() {
+                            if (confirm('Tem certeza que deseja marcar este plano como concluído? Todas as ações serão marcadas como concluídas.')) {
+                                const updates = {};
+                                
+                                // Marcar todas as ações como concluídas
+                                if (plan.actions && plan.actions.length > 0) {
+                                    plan.actions.forEach((action, index) => {
+                                        updates[`plans/${planId}/actions/${index}/status`] = 'Concluído';
+                                        updates[`plans/${planId}/actions/${index}/completed`] = true;
+                                    });
+                                }
+                                
+                                // Marcar plano como concluído
+                                updates[`plans/${planId}/status`] = 'Concluído';
+                                
+                                database.ref().update(updates)
+                                    .then(() => {
+                                        // Registrar log
+                                        return database.ref('system_logs').push().set({
+                                            type: 'plan_completed',
+                                            userId: currentUser.uid,
+                                            userEmail: currentUser.email,
+                                            userName: userData.name,
+                                            timestamp: firebase.database.ServerValue.TIMESTAMP,
+                                            details: `Plano "${plan.title}" marcado como concluído`,
+                                            planId: planId
+                                        });
+                                    })
+                                    .then(() => {
+                                        alert('Plano marcado como concluído com sucesso!');
+                                        planDetailsModal.hide();
+                                        loadDashboardData();
+                                        loadPlansTable();
+                                        loadActionsTable();
+                                        loadManageActions();
+                                    })
+                                    .catch(error => {
+                                        alert('Erro ao marcar plano como concluído: ' + error.message);
+                                    });
+                            }
+                        };
+
+                        cancelPlanBtn.onclick = function() {
+                            if (confirm('Tem certeza que deseja cancelar este plano? Todas as ações serão marcadas como canceladas.')) {
+                                const updates = {};
+                                
+                                // Marcar todas as ações como canceladas
+                                if (plan.actions && plan.actions.length > 0) {
+                                    plan.actions.forEach((action, index) => {
+                                        updates[`plans/${planId}/actions/${index}/status`] = 'Cancelado';
+                                        updates[`plans/${planId}/actions/${index}/completed`] = true;
+                                    });
+                                }
+                                
+                                // Marcar plano como cancelado
+                                updates[`plans/${planId}/status`] = 'Cancelado';
+                                
+                                database.ref().update(updates)
+                                    .then(() => {
+                                        // Registrar log
+                                        return database.ref('system_logs').push().set({
+                                            type: 'plan_canceled',
+                                            userId: currentUser.uid,
+                                            userEmail: currentUser.email,
+                                            userName: userData.name,
+                                            timestamp: firebase.database.ServerValue.TIMESTAMP,
+                                            details: `Plano "${plan.title}" cancelado`,
+                                            planId: planId
+                                        });
+                                    })
+                                    .then(() => {
+                                        alert('Plano cancelado com sucesso!');
+                                        planDetailsModal.hide();
+                                        loadDashboardData();
+                                        loadPlansTable();
+                                        loadActionsTable();
+                                        loadManageActions();
+                                    })
+                                    .catch(error => {
+                                        alert('Erro ao cancelar plano: ' + error.message);
+                                    });
+                            }
+                        };
+
+                        // Mostrar modal
+                        document.getElementById('plan-details-title').textContent = `Detalhes: ${plan.title}`;
+                        planDetailsModal.show();
+                    });
+            }
+
+            // Enviar evidência de conclusão
+            evidenceForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (!currentUser) return;
+                
+                const planId = document.getElementById('evidence-plan-id').value;
+                const actionIndex = document.getElementById('evidence-action-index').value;
+                const comments = document.getElementById('evidence-comments').value;
+                const imageFile = evidenceImageInput.files[0];
+                
+                if (!imageFile) {
+                    alert('Por favor, selecione uma imagem como evidência');
+                    return;
+                }
+                
+                const submitBtn = evidenceForm.querySelector('button[type="submit"]');
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enviando...';
+
+                // Converter imagem para base64
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const imageBase64 = e.target.result;
+                    
+                    const evidence = {
+                        comments: comments,
+                        image: imageBase64,
+                        sentBy: currentUser.uid,
+                        sentByName: userData.name,
+                        sentAt: firebase.database.ServerValue.TIMESTAMP
+                    };
+                    
+                    // Atualizar ação no Firebase
+                    const updates = {};
+                    updates[`plans/${planId}/actions/${actionIndex}/status`] = 'Concluído';
+                    updates[`plans/${planId}/actions/${actionIndex}/evidence`] = evidence;
+                    
+                    database.ref().update(updates)
+                        .then(() => {
+                            // Registrar log
+                            return database.ref('system_logs').push().set({
+                                type: 'action_completed',
+                                userId: currentUser.uid,
+                                userEmail: currentUser.email,
+                                userName: userData.name,
+                                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                                details: `Ação concluída no plano ${planId}`,
+                                planId: planId,
+                                actionIndex: actionIndex
+                            });
+                        })
+                        .then(() => {
+                            alert('Evidência enviada com sucesso!');
+                            evidenceModal.hide();
+                            evidenceForm.reset();
+                            evidencePreview.classList.add('d-none');
+                            
+                            // Recarregar seções relevantes
+                            loadDashboardData();
+                            loadPlansTable();
+                            loadActionsTable();
+                            loadManageActions();
+                        })
+                        .catch(error => {
+                            alert('Erro ao enviar evidência: ' + error.message);
+                        })
+                        .finally(() => {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Enviar Evidência';
+                        });
+                };
+                reader.readAsDataURL(imageFile);
+            });
+            
+            // Pré-visualizar imagem de evidência
+            evidenceImageInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        evidencePreviewImage.src = e.target.result;
+                        evidencePreview.classList.remove('d-none');
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+
+            // Carregar tabela de ações
+            function loadActionsTable() {
+                if (!currentUser) return;
+
+                actionsTableBody.innerHTML = '<tr><td colspan="8" class="text-center">Carregando...</td></tr>';
+
+                const planFilterValue = planFilter.value;
+                const statusFilterValue = actionStatusFilter.value;
+                const areaFilterValue = actionAreaFilter.value;
+                const unitFilterValue = actionUnitFilter.value;
+                const searchText = searchActionsInput.value.toLowerCase();
+
+                let query = database.ref('plans');
+
+                query.once('value')
+                    .then((snapshot) => {
+                        actionsTableBody.innerHTML = '';
+
+                        if (!snapshot.exists()) {
+                            actionsTableBody.innerHTML = '<tr><td colspan="8" class="text-center">Nenhuma ação encontrada</td></tr>';
+                            return;
+                        }
+
+                        let hasActions = false;
+
+                        snapshot.forEach(planSnapshot => {
+                            const plan = planSnapshot.val();
+                            if (!plan.actions) return;
+
+                            // Filtrar por plano selecionado
+                            if (planFilterValue && planSnapshot.key !== planFilterValue) return;
+                            
+                            // Filtrar por área selecionada
+                            if (areaFilterValue && plan.area !== areaFilterValue) return;
+                            
+                            // Filtrar por unidade selecionada
+                            if (unitFilterValue && plan.unit !== unitFilterValue) return;
+
+                            plan.actions.forEach((action, index) => {
+                                // Filtrar por status selecionado
+                                if (statusFilterValue && action.status !== statusFilterValue) return;
+                                
+                                // Filtrar por texto de busca
+                                if (searchText && !action.activity.toLowerCase().includes(searchText) && 
+                                    !action.objective.toLowerCase().includes(searchText) &&
+                                    !action.responsible.toLowerCase().includes(searchText)) {
+                                    return;
+                                }
+
+                                hasActions = true;
+                                const today = new Date();
+                                const endDate = new Date(action.endDate);
+                                const isLate = endDate < today && action.status !== 'Concluído';
+
+                                const row = document.createElement('tr');
+                                row.className = action.status === 'Concluído' ? 'table-success' : 
+                                               isLate ? 'table-danger' : 
+                                               action.status === 'Em Andamento' ? 'table-warning' : '';
+                                row.innerHTML = `
+                                    <td>${plan.title}</td>
+                                    <td>${plan.area}</td>
+                                    <td>${plan.unit}</td>
+                                    <td>${action.objective}</td>
+                                    <td>${action.activity}</td>
+                                    <td>${action.responsible}</td>
+                                    <td>
+                                        <span class="badge ${getStatusBadgeClass(action.status)}">
+                                            ${action.status} ${isLate ? '(Atrasado)' : ''}
+                                        </span>
+                                    </td>
+                                    <td>${formatDate(action.endDate)}</td>
+                                `;
+                                actionsTableBody.appendChild(row);
+                            });
+                        });
+
+                        if (!hasActions) {
+                            actionsTableBody.innerHTML = '<tr><td colspan="8" class="text-center">Nenhuma ação encontrada com os filtros selecionados</td></tr>';
+                        }
+                    });
+            }
+
+            // Carregar ações para gerenciamento
+            function loadManageActions() {
+                if (!currentUser) return;
+
+                manageActionsContainer.innerHTML = '<div class="text-center my-4">Carregando...</div>';
+
+                const planFilterValue = managePlanFilter.value;
+                const statusFilterValue = statusFilter.value;
+                const areaFilterValue = manageAreaFilter.value;
+                const unitFilterValue = manageUnitFilter.value;
+                const searchText = searchManageActionsInput.value.toLowerCase();
+
+                let query = database.ref('plans');
+
+                query.once('value')
+                    .then((snapshot) => {
+                        manageActionsContainer.innerHTML = '';
+
+                        if (!snapshot.exists()) {
+                            manageActionsContainer.innerHTML = '<div class="text-center my-4">Nenhuma ação encontrada</div>';
+                            return;
+                        }
+
+                        let hasActions = false;
+
+                        snapshot.forEach(planSnapshot => {
+                            const plan = planSnapshot.val();
+                            if (!plan.actions) return;
+
+                            // Filtrar por plano selecionado
+                            if (planFilterValue && planSnapshot.key !== planFilterValue) return;
+                            
+                            // Filtrar por área selecionada
+                            if (areaFilterValue && plan.area !== areaFilterValue) return;
+                            
+                            // Filtrar por unidade selecionada
+                            if (unitFilterValue && plan.unit !== unitFilterValue) return;
+
+                            plan.actions.forEach((action, index) => {
+                                // Filtrar por status selecionado
+                                if (statusFilterValue && action.status !== statusFilterValue) return;
+                                
+                                // Filtrar por texto de busca
+                                if (searchText && !action.activity.toLowerCase().includes(searchText) && 
+                                    !action.objective.toLowerCase().includes(searchText) &&
+                                    !action.responsible.toLowerCase().includes(searchText)) {
+                                    return;
+                                }
+
+                                hasActions = true;
+                                const today = new Date();
+                                const endDate = new Date(action.endDate);
+                                const isLate = endDate < today && action.status !== 'Concluído';
+
+                                const actionId = `action-${planSnapshot.key}-${index}`;
+                                if (document.getElementById(actionId)) return;
+
+                                const actionElement = document.createElement('div');
+                                actionElement.id = actionId;
+                                actionElement.className = `action-item mb-3 p-3 rounded ${action.status === 'Concluído' ? 'completed' : 
+                                                         action.status === 'Em Andamento' ? 'pending' : ''} ${isLate ? 'late' : ''}`;
+                                
+                                actionElement.innerHTML = `
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6>${action.activity}</h6>
+                                            <p class="mb-1"><strong>Plano:</strong> ${plan.title}</p>
+                                            <p class="mb-1"><strong>Área:</strong> ${plan.area}</p>
+                                            <p class="mb-1"><strong>Unidade:</strong> ${plan.unit}</p>
+                                            <p class="mb-1"><strong>How - Como? :</strong> ${action.how}</p>
+                                            <p class="mb-1"><strong>Objetivo:</strong> ${action.objective}</p>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge ${getPriorityBadgeClass(action.priority)}">${action.priority}</span>
+                                            <span class="badge ${getStatusBadgeClass(action.status)}">${action.status}</span>
+                                            ${isLate ? '<span class="badge bg-danger">Atrasado</span>' : ''}
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col-md-3">
+                                            <p class="mb-1"><strong>Responsável:</strong> ${action.responsible}</p>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <p class="mb-1"><strong>Executor:</strong> ${action.executor}</p>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="mb-1">
+                                                <strong>Prazo:</strong> 
+                                                <span class="editable-date" 
+                                                    data-plan-id="${planSnapshot.key}" 
+                                                    data-action-index="${index}">
+                                                    ${formatDate(action.endDate)}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="d-flex justify-content-end gap-2">
+                                                ${action.status !== 'Concluído' ? `
+                                                <button class="btn btn-sm btn-success complete-action-btn" 
+                                                    data-plan-id="${planSnapshot.key}" 
+                                                    data-action-index="${index}">
+                                                    <i class="bi bi-check-circle"></i> Concluir
+                                                </button>
+                                                ` : ''}
+                                                
+                                                ${action.status !== 'Cancelado' ? `
+                                                <button class="btn btn-sm btn-danger cancel-action-btn" 
+                                                    data-plan-id="${planSnapshot.key}" 
+                                                    data-action-index="${index}">
+                                                    <i class="bi bi-x-circle"></i> Cancelar
+                                                </button>
+                                                ` : ''}
+                                                
+                                                ${action.status !== 'Concluído' ? `
+                                                <button class="btn btn-sm btn-primary evidence-action-btn" 
+                                                    data-plan-id="${planSnapshot.key}" 
+                                                    data-action-index="${index}">
+                                                    <i class="bi bi-image"></i> Evidência
+                                                </button>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    ${action.status === 'Concluído' && action.evidence ? `
+                                    <div class="row mt-2">
+                                        <div class="col-md-12">
+                                            <p><strong>Evidência:</strong></p>
+                                            <p>${action.evidence.comments || 'Sem comentários'}</p>
+                                            <img src="${action.evidence.image}" class="evidence-image" alt="Evidência da ação">
+                                        </div>
+                                    </div>
+                                    ` : ''}
+                                `;
+                                manageActionsContainer.appendChild(actionElement);
+                            });
+                        });
+
+                        if (!hasActions) {
+                            manageActionsContainer.innerHTML = '<div class="text-center my-4">Nenhuma ação encontrada com os filtros selecionados</div>';
+                        }
+
+                        // Adicionar eventos aos botões de conclusão
+                        document.querySelectorAll('.complete-action-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const planId = this.getAttribute('data-plan-id');
+                                const actionIndex = this.getAttribute('data-action-index');
+                                
+                                if (confirm('Tem certeza que deseja marcar esta ação como concluída?')) {
+                                    const updates = {};
+                                    updates[`plans/${planId}/actions/${actionIndex}/status`] = 'Concluído';
+                                    updates[`plans/${planId}/actions/${actionIndex}/completed`] = true;
+                                    
+                                    database.ref().update(updates)
+                                        .then(() => {
+                                            // Registrar log
+                                            return database.ref('system_logs').push().set({
+                                                type: 'action_completed',
+                                                userId: currentUser.uid,
+                                                userEmail: currentUser.email,
+                                                userName: userData.name,
+                                                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                                                details: `Ação concluída no plano ${planId}`,
+                                                planId: planId,
+                                                actionIndex: actionIndex
+                                            });
+                                        })
+                                        .then(() => {
+                                            loadManageActions();
+                                            loadDashboardData();
+                                            loadPlansTable();
+                                            loadActionsTable();
+                                        })
+                                        .catch(error => {
+                                            alert('Erro ao marcar ação como concluída: ' + error.message);
+                                        });
+                                }
+                            });
+                        });
+
+                        // Adicionar eventos aos botões de cancelamento
+                        document.querySelectorAll('.cancel-action-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const planId = this.getAttribute('data-plan-id');
+                                const actionIndex = this.getAttribute('data-action-index');
+                                
+                                if (confirm('Tem certeza que deseja cancelar esta ação?')) {
+                                    const updates = {};
+                                    updates[`plans/${planId}/actions/${actionIndex}/status`] = 'Cancelado';
+                                    updates[`plans/${planId}/actions/${actionIndex}/completed`] = true;
+                                    
+                                    database.ref().update(updates)
+                                        .then(() => {
+                                            // Registrar log
+                                            return database.ref('system_logs').push().set({
+                                                type: 'action_canceled',
+                                                userId: currentUser.uid,
+                                                userEmail: currentUser.email,
+                                                userName: userData.name,
+                                                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                                                details: `Ação cancelada no plano ${planId}`,
+                                                planId: planId,
+                                                actionIndex: actionIndex
+                                            });
+                                        })
+                                        .then(() => {
+                                            loadManageActions();
+                                            loadDashboardData();
+                                            loadPlansTable();
+                                            loadActionsTable();
+                                        })
+                                        .catch(error => {
+                                            alert('Erro ao cancelar ação: ' + error.message);
+                                        });
+                                }
+                            });
+                        });
+
+                        // Adicionar eventos aos botões de evidência
+                        document.querySelectorAll('.evidence-action-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const planId = this.getAttribute('data-plan-id');
+                                const actionIndex = this.getAttribute('data-action-index');
+                                
+                                document.getElementById('evidence-plan-id').value = planId;
+                                document.getElementById('evidence-action-index').value = actionIndex;
+                                evidenceModal.show();
+                            });
+                        });
+
+                        // Adicionar eventos para edição de datas
+                        document.querySelectorAll('.editable-date').forEach(dateElement => {
+                            dateElement.addEventListener('click', function() {
+                                const planId = this.getAttribute('data-plan-id');
+                                const actionIndex = parseInt(this.getAttribute('data-action-index'));
+                                const originalText = this.textContent;
+                                
+                                // Obter a data atual do Firebase para este item
+                                database.ref(`plans/${planId}/actions/${actionIndex}/endDate`).once('value')
+                                    .then((snapshot) => {
+                                        const currentDate = snapshot.val();
+                                        const dateValue = currentDate ? new Date(currentDate).toISOString().split('T')[0] : '';
+                                        
+                                        // Criar input de data
+                                        const dateInput = document.createElement('input');
+                                        dateInput.type = 'date';
+                                        dateInput.className = 'form-control form-control-sm';
+                                        dateInput.value = dateValue;
+                                        
+                                        // Criar botões
+                                        const saveBtn = document.createElement('button');
+                                        saveBtn.className = 'btn btn-sm btn-success save-date-btn';
+                                        saveBtn.innerHTML = '<i class="bi bi-check"></i>';
+                                        
+                                        const cancelBtn = document.createElement('button');
+                                        cancelBtn.className = 'btn btn-sm btn-danger cancel-date-btn';
+                                        cancelBtn.innerHTML = '<i class="bi bi-x"></i>';
+                                        
+                                        // Criar container
+                                        const container = document.createElement('div');
+                                        container.className = 'date-input-container';
+                                        container.appendChild(dateInput);
+                                        container.appendChild(saveBtn);
+                                        container.appendChild(cancelBtn);
+                                        
+                                        // Substituir o texto pelo input
+                                        this.parentNode.replaceChild(container, this);
+                                        
+                                        // Evento para salvar
+                                        saveBtn.addEventListener('click', function() {
+                                            const newDate = dateInput.value;
+                                            if (!newDate) {
+                                                alert('Por favor, selecione uma data válida');
+                                                return;
+                                            }
+                                            
+                                            // Verificar se o usuário é administrador
+                                            if (userData.userType === 'admin' || userData.isAdmin) {
+                                                // Atualizar diretamente no Firebase
+                                                const updates = {};
+                                                updates[`plans/${planId}/actions/${actionIndex}/endDate`] = newDate;
+                                                
+                                                database.ref().update(updates)
+                                                    .then(() => {
+                                                        // Registrar log
+                                                        return database.ref('system_logs').push().set({
+                                                            type: 'action_date_changed',
+                                                            userId: currentUser.uid,
+                                                            userEmail: currentUser.email,
+                                                            userName: userData.name,
+                                                            timestamp: firebase.database.ServerValue.TIMESTAMP,
+                                                            details: `Prazo da ação alterado no plano ${planId}`,
+                                                            planId: planId,
+                                                            actionIndex: actionIndex,
+                                                            oldDate: currentDate,
+                                                            newDate: newDate
+                                                        });
+                                                    })
+                                                    .then(() => {
+                                                        // Recarregar a seção de gerenciamento
+                                                        loadManageActions();
+                                                        // Recarregar outras seções relevantes
+                                                        loadDashboardData();
+                                                        loadPlansTable();
+                                                        loadActionsTable();
+                                                    })
+                                                    .catch(error => {
+                                                        alert('Erro ao atualizar a data: ' + error.message);
+                                                    });
+                                            } else {
+                                                // Usuário normal - enviar solicitação para administração
+                                                const requestRef = database.ref('admin_requests').push();
+                                                requestRef.set({
+                                                    type: 'date_change',
+                                                    planId: planId,
+                                                    actionIndex: actionIndex,
+                                                    currentDate: currentDate,
+                                                    newDate: newDate,
+                                                    requestedBy: currentUser.uid,
+                                                    requestedByName: userData.name,
+                                                    requestedAt: firebase.database.ServerValue.TIMESTAMP,
+                                                    status: 'pending'
+                                                })
+                                                .then(() => {
+                                                    // Registrar log
+                                                    return database.ref('system_logs').push().set({
+                                                        type: 'admin_request_created',
+                                                        userId: currentUser.uid,
+                                                        userEmail: currentUser.email,
+                                                        userName: userData.name,
+                                                        timestamp: firebase.database.ServerValue.TIMESTAMP,
+                                                        details: `Solicitação de alteração de prazo para ação no plano ${planId}`,
+                                                        planId: planId,
+                                                        actionIndex: actionIndex,
+                                                        requestId: requestRef.key
+                                                    });
+                                                })
+                                                .then(() => {
+                                                    alert('Solicitação de alteração de prazo enviada para administração.');
+                                                    // Recarregar a seção de gerenciamento
+                                                    loadManageActions();
+                                                })
+                                                .catch(error => {
+                                                    alert('Erro ao enviar solicitação: ' + error.message);
+                                                });
+                                            }
+                                        });
+                                        
+                                        // Evento para cancelar
+                                        cancelBtn.addEventListener('click', function() {
+                                            // Restaurar o texto original
+                                            const span = document.createElement('span');
+                                            span.className = 'editable-date';
+                                            span.setAttribute('data-plan-id', planId);
+                                            span.setAttribute('data-action-index', actionIndex);
+                                            span.textContent = originalText;
+                                            
+                                            // Reaplicar o evento
+                                            span.addEventListener('click', dateElement.click.bind(dateElement));
+                                            
+                                            container.parentNode.replaceChild(span, container);
+                                        });
+                                    });
+                            });
+                        });
+                    });
+            }
+
+            // Carregar solicitações de administração
+            function loadAdminRequests() {
+                if (!currentUser || !(userData.userType === 'admin' || userData.isAdmin)) return;
+                
+                adminRequestsContainer.innerHTML = '<div class="text-center my-4">Carregando...</div>';
+                
+                database.ref('admin_requests').orderByChild('status').equalTo('pending').once('value')
+                    .then((snapshot) => {
+                        adminRequestsContainer.innerHTML = '';
+                        
+                        if (!snapshot.exists()) {
+                            adminRequestsContainer.innerHTML = '<div class="text-center my-4">Nenhuma solicitação pendente</div>';
+                            updateAdminBadge(0);
+                            return;
+                        }
+                        
+                        let requestCount = 0;
+                        
+                        snapshot.forEach(requestSnapshot => {
+                            const request = requestSnapshot.val();
+                            request.id = requestSnapshot.key;
+                            
+                            if (request.status === 'pending') {
+                                requestCount++;
+                                
+                                const requestElement = document.createElement('div');
+                                requestElement.className = 'admin-request-item';
+                                
+                                if (request.type === 'date_change') {
+                                    requestElement.innerHTML = `
+                                        <h6>Solicitação de Alteração de Prazo</h6>
+                                        <p><strong>Solicitante:</strong> ${request.requestedByName}</p>
+                                        <p><strong>Plano:</strong> ${request.planId}</p>
+                                        <p><strong>Ação:</strong> ${request.actionIndex}</p>
+                                        <p><strong>Data Atual:</strong> ${formatDate(request.currentDate)}</p>
+                                        <p><strong>Nova Data:</strong> ${formatDate(request.newDate)}</p>
+                                        <p><strong>Solicitado em:</strong> ${formatDate(request.requestedAt)}</p>
+                                        <div class="d-flex justify-content-end gap-2 mt-2">
+                                            <button class="btn btn-sm btn-success approve-request-btn" data-id="${request.id}">
+                                                <i class="bi bi-check"></i> Aprovar
+                                            </button>
+                                            <button class="btn btn-sm btn-danger reject-request-btn" data-id="${request.id}">
+                                                <i class="bi bi-x"></i> Rejeitar
+                                            </button>
+                                        </div>
+                                    `;
+                                }
+                                
+                                adminRequestsContainer.appendChild(requestElement);
+                            }
+                        });
+                        
+                        // Atualizar contador de solicitações pendentes
+                        updateAdminBadge(requestCount);
+                        
+                        // Adicionar eventos aos botões de aprovação/rejeição
+                        document.querySelectorAll('.approve-request-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const requestId = this.getAttribute('data-id');
+                                processAdminRequest(requestId, true);
+                            });
+                        });
+                        
+                        document.querySelectorAll('.reject-request-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const requestId = this.getAttribute('data-id');
+                                processAdminRequest(requestId, false);
+                            });
+                        });
+                    });
+            }
+            
+            // Processar solicitação de administração
+            function processAdminRequest(requestId, approve) {
+                database.ref(`admin_requests/${requestId}`).once('value')
+                    .then((snapshot) => {
+                        const request = snapshot.val();
+                        
+                        if (!request || request.status !== 'pending') {
+                            alert('Solicitação não encontrada ou já processada');
+                            return;
+                        }
+                        
+                        // Atualizar status da solicitação
+                        const updates = {};
+                        updates[`admin_requests/${requestId}/status`] = approve ? 'approved' : 'rejected';
+                        updates[`admin_requests/${requestId}/processedBy`] = currentUser.uid;
+                        updates[`admin_requests/${requestId}/processedByName`] = userData.name;
+                        updates[`admin_requests/${requestId}/processedAt`] = firebase.database.ServerValue.TIMESTAMP;
+                        
+                        // Se for aprovação, aplicar a alteração
+                        if (approve && request.type === 'date_change') {
+                            updates[`plans/${request.planId}/actions/${request.actionIndex}/endDate`] = request.newDate;
+                        }
+                        
+                        return database.ref().update(updates);
+                    })
+                    .then(() => {
+                        // Registrar log
+                        return database.ref('system_logs').push().set({
+                            type: 'admin_request_processed',
+                            userId: currentUser.uid,
+                            userEmail: currentUser.email,
+                            userName: userData.name,
+                            timestamp: firebase.database.ServerValue.TIMESTAMP,
+                            details: `Solicitação ${approve ? 'aprovada' : 'rejeitada'}: ${requestId}`,
+                            requestId: requestId,
+                            action: approve ? 'approved' : 'rejected'
+                        });
+                    })
+                    .then(() => {
+                        alert(`Solicitação ${approve ? 'aprovada' : 'rejeitada'} com sucesso!`);
+                        loadAdminRequests();
+                    })
+                    .catch(error => {
+                        alert('Erro ao processar solicitação: ' + error.message);
+                    });
+            }
+            
+            // Carregar tabela de usuários
+            function loadUsersTable() {
+                if (!currentUser || !(userData.userType === 'admin' || userData.isAdmin)) return;
+                
+                usersTableBody.innerHTML = '<tr><td colspan="5" class="text-center">Carregando...</td></tr>';
+                
+                database.ref('users').once('value')
+                    .then((snapshot) => {
+                        usersTableBody.innerHTML = '';
+                        
+                        if (!snapshot.exists()) {
+                            usersTableBody.innerHTML = '<tr><td colspan="5" class="text-center">Nenhum usuário encontrado</td></tr>';
+                            return;
+                        }
+                        
+                        snapshot.forEach(userSnapshot => {
+                            const user = userSnapshot.val();
+                            user.id = userSnapshot.key;
+                            
+                            const lastLogin = user.lastLogin ? new Date(user.lastLogin).toLocaleString('pt-BR') : 'Nunca';
+                            
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${user.name}</td>
+                                <td>${user.email}</td>
+                                <td>${user.userType === 'admin' || user.isAdmin ? 'Administrador' : 'Usuário Normal'}</td>
+                                <td>${lastLogin}</td>
+                                <td class="text-end">
+                                    ${user.id !== currentUser.uid ? `
+                                    <button class="btn btn-sm btn-danger delete-user-btn" data-id="${user.id}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    ` : ''}
+                                </td>
+                            `;
+                            usersTableBody.appendChild(row);
+                        });
+                        
+                        // Adicionar eventos aos botões de exclusão
+                        document.querySelectorAll('.delete-user-btn').forEach(btn => {
+                            btn.addEventListener('click', function() {
+                                const userId = this.getAttribute('data-id');
+                                
+                                if (confirm('Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.')) {
+                                    database.ref(`users/${userId}`).remove()
+                                        .then(() => {
+                                            // Registrar log
+                                            return database.ref('system_logs').push().set({
+                                                type: 'user_deleted',
+                                                userId: currentUser.uid,
+                                                userEmail: currentUser.email,
+                                                userName: userData.name,
+                                                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                                                details: `Usuário ${userId} excluído`,
+                                                deletedUserId: userId
+                                            });
+                                        })
+                                        .then(() => {
+                                            alert('Usuário excluído com sucesso!');
+                                            loadUsersTable();
+                                        })
+                                        .catch(error => {
+                                            alert('Erro ao excluir usuário: ' + error.message);
+                                        });
+                                }
+                            });
+                        });
+                    });
+            }
+            
+            // Carregar logs do sistema
+            function loadSystemLogs() {
+                if (!currentUser || !(userData.userType === 'admin' || userData.isAdmin)) return;
+                
+                logsTableBody.innerHTML = '<tr><td colspan="4" class="text-center">Carregando...</td></tr>';
+                
+                database.ref('system_logs').orderByChild('timestamp').limitToLast(50).once('value')
+                    .then((snapshot) => {
+                        logsTableBody.innerHTML = '';
+                        
+                        if (!snapshot.exists()) {
+                            logsTableBody.innerHTML = '<tr><td colspan="4" class="text-center">Nenhum log encontrado</td></tr>';
+                            return;
+                        }
+                        
+                        const logs = [];
+                        snapshot.forEach(logSnapshot => {
+                            const log = logSnapshot.val();
+                            log.id = logSnapshot.key;
+                            logs.push(log);
+                        });
+                        
+                        // Ordenar logs por timestamp (do mais recente para o mais antigo)
+                        logs.sort((a, b) => b.timestamp - a.timestamp);
+                        
+                        logs.forEach(log => {
+                            const date = new Date(log.timestamp);
+                            const dateStr = date.toLocaleString('pt-BR');
+                            
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${dateStr}</td>
+                                <td>${log.userName || log.userEmail}</td>
+                                <td>${getLogActionDescription(log.type)}</td>
+                                <td>${log.details || ''}</td>
+                            `;
+                            logsTableBody.appendChild(row);
+                        });
+                    });
+            }
+            
+            // Obter descrição da ação do log
+            function getLogActionDescription(type) {
+                const descriptions = {
+                    'login': 'Login',
+                    'logout': 'Logout',
+                    'plan_created': 'Plano criado',
+                    'plan_completed': 'Plano concluído',
+                    'plan_canceled': 'Plano cancelado',
+                    'action_completed': 'Ação concluída',
+                    'action_canceled': 'Ação cancelada',
+                    'action_date_changed': 'Data da ação alterada',
+                    'admin_request_created': 'Solicitação de admin criada',
+                    'admin_request_processed': 'Solicitação de admin processada',
+                    'user_deleted': 'Usuário excluído',
+                    'notification_sent': 'Notificação enviada'
+                };
+                
+                return descriptions[type] || type;
+            }
+
+            // Carregar configurações de notificação
+            function loadNotificationSettings() {
+                if (!currentUser) return;
+
+                notificationEmailsTable.innerHTML = '<tr><td colspan="3" class="text-center">Carregando...</td></tr>';
+
+                // Carregar emails cadastrados
+                database.ref(`notification_emails/${currentUser.uid}`).once('value')
+                    .then((snapshot) => {
+                        notificationEmailsTable.innerHTML = '';
+
+                        if (!snapshot.exists()) {
+                            notificationEmailsTable.innerHTML = '<tr><td colspan="3" class="text-center">Nenhum email cadastrado</td></tr>';
+                        } else {
+                            snapshot.forEach(emailSnapshot => {
+                                const emailData = emailSnapshot.val();
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                    <td>${typeof emailData === 'string' ? emailData : emailData.email}</td>
+                                    <td>${formatDate(emailData.createdAt || emailSnapshot.key)}</td>
+                                    <td class="text-end">
+                                        <button class="btn btn-sm btn-danger delete-email-btn" data-id="${emailSnapshot.key}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                `;
+                                notificationEmailsTable.appendChild(row);
+                            });
+
+                            // Adicionar eventos aos botões de exclusão
+                            document.querySelectorAll('.delete-email-btn').forEach(btn => {
+                                btn.addEventListener('click', function() {
+                                    const emailId = this.getAttribute('data-id');
+                                    database.ref(`notification_emails/${currentUser.uid}/${emailId}`).remove()
+                                        .then(() => {
+                                            loadNotificationSettings();
+                                        })
+                                        .catch(error => {
+                                            alert('Erro ao remover email: ' + error.message);
+                                        });
+                                });
+                            });
+                        }
+                    });
+
+                // Carregar configurações de notificação
+                database.ref(`notification_settings/${currentUser.uid}`).once('value')
+                    .then((snapshot) => {
+                        const settings = snapshot.val() || {};
+                        enableNotifications.checked = settings.enabled !== false; // Padrão: true
+                        notificationTime.value = settings.time || '09:00';
+                    });
+            }
+
+            // Adicionar email para notificação
+            notificationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                if (!currentUser) return;
+
+                const email = notificationEmailInput.value.trim();
+                if (!email) {
+                    alert('Por favor, insira um email válido');
+                    return;
+                }
+
+                const emailRef = database.ref(`notification_emails/${currentUser.uid}`).push();
+                emailRef.set({
+                    email: email,
+                    createdAt: firebase.database.ServerValue.TIMESTAMP
+                }).then(() => {
+                    notificationEmailInput.value = '';
+                    loadNotificationSettings();
+                }).catch(error => {
+                    alert('Erro ao adicionar email: ' + error.message);
+                });
+            });
+
+            // Salvar configurações de notificação
+            saveNotificationSettings.addEventListener('click', function() {
+                if (!currentUser) return;
+
+                const settings = {
+                    enabled: enableNotifications.checked,
+                    time: notificationTime.value
+                };
+
+                database.ref(`notification_settings/${currentUser.uid}`).set(settings)
+                    .then(() => {
+                        alert('Configurações salvas com sucesso!');
+                    })
+                    .catch(error => {
+                        alert('Erro ao salvar configurações: ' + error.message);
+                    });
+            });
+
+            // Enviar email de teste
+            testNotificationBtn.addEventListener('click', function() {
+                if (!currentUser || !userData) {
+                    alert('Você precisa estar logado');
+                    return;
+                }
+
+                // Verificar se há emails cadastrados
+                database.ref(`notification_emails/${currentUser.uid}`).once('value')
+                    .then((snapshot) => {
+                        if (!snapshot.exists() || snapshot.numChildren() === 0) {
+                            alert('Nenhum email cadastrado para enviar notificação');
+                            return;
+                        }
+
+                        // Obter ações atrasadas
+                        database.ref('plans').once('value')
+                            .then((plansSnapshot) => {
+                                const lateActions = [];
+                                const today = new Date();
+
+                                plansSnapshot.forEach(planSnapshot => {
+                                    const plan = planSnapshot.val();
+                                    if (!plan.actions) return;
+
+                                    plan.actions.forEach(action => {
+                                        if (action.status !== 'Concluído' && action.endDate) {
+                                            const endDate = new Date(action.endDate);
+                                            if (endDate < today) {
+                                                lateActions.push({
+                                                    planTitle: plan.title,
+                                                    activity: action.activity,
+                                                    responsible: action.responsible,
+                                                    endDate: formatDate(action.endDate),
+                                                    daysLate: Math.floor((today - endDate) / (1000 * 60 * 60 * 24))
+                                                });
+                                            }
+                                        }
+                                    });
+                                });
+
+                                if (lateActions.length === 0) {
+                                    alert('Nenhuma ação atrasada encontrada para notificar');
+                                    return;
+                                }
+
+                                // Construir mensagem
+                                let message = `<h2>Notificação de Ações Atrasadas</h2>`;
+                                message += `<p>Olá, ${userData.name}!</p>`;
+                                message += `<p>Você tem <strong>${lateActions.length} ações atrasadas</strong> no sistema:</p>`;
+                                message += `<ul>`;
+                                lateActions.forEach(action => {
+                                    message += `<li><strong>${action.planTitle}</strong>: ${action.activity} (Responsável: ${action.responsible}, Atraso: ${action.daysLate} dias)</li>`;
+                                });
+                                message += `</ul>`;
+                                message += `<p>Acesse o sistema para atualizar o status dessas ações.</p>`;
+
+                                // Enviar para cada email cadastrado
+                                snapshot.forEach(emailSnap => {
+                                    const data = emailSnap.val();
+                                    const toEmail = typeof data === 'string' ? data : data.email;
+
+                                    // Parâmetros para o e-mail
+                                    const params = {
+                                        to_email: toEmail,
+                                        name: userData.name,
+                                        message: message
+                                    };
+
+                                    console.log("Enviando e-mail para:", toEmail);
+
+                                    emailjs.send("service_98e468r", "template_mvgbfgp", params)
+                                        .then((response) => {
+                                            console.log("✅ Email enviado com sucesso para", toEmail, response.status);
+                                            // Registrar log
+                                            return database.ref('system_logs').push().set({
+                                                type: 'notification_sent',
+                                                userId: currentUser.uid,
+                                                userEmail: currentUser.email,
+                                                userName: userData.name,
+                                                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                                                details: `Email de teste enviado para ${toEmail}`,
+                                                recipient: toEmail
+                                            });
+                                        })
+                                        .then(() => {
+                                            alert('Email de teste enviado com sucesso para todos os destinatários cadastrados!');
+                                        })
+                                        .catch((error) => {
+                                            console.error("❌ Erro ao enviar para", toEmail, error);
+                                        });
+                                });
+                            });
+                    });
+            });
+
+            // Verificar notificações pendentes
+            function checkForNotifications() {
+                if (!currentUser) return;
+
+                database.ref(`notification_settings/${currentUser.uid}`).once('value')
+                    .then((settingsSnapshot) => {
+                        const settings = settingsSnapshot.val() || {};
+                        
+                        // Verificar se notificações estão habilitadas
+                        if (settings.enabled === false) return;
+                        
+                        // Obter hora atual
+                        const now = new Date();
+                        const currentHour = now.getHours().toString().padStart(2, '0');
+                        const currentMinute = now.getMinutes().toString().padStart(2, '0');
+                        const currentTime = `${currentHour}:${currentMinute}`;
+                        
+                        // Verificar se é hora de enviar notificações
+                        if (settings.time && settings.time === currentTime) {
+                            // Verificar se já foi enviado hoje
+                            const today = now.toISOString().split('T')[0];
+                            database.ref(`last_notification_sent/${currentUser.uid}`).once('value')
+                                .then((lastSentSnapshot) => {
+                                    const lastSentDate = lastSentSnapshot.val();
+                                    
+                                    if (lastSentDate !== today) {
+                                        // Obter ações atrasadas
+                                        database.ref('plans').orderByChild('createdBy').equalTo(currentUser.uid).once('value')
+                                            .then((plansSnapshot) => {
+                                                const lateActions = [];
+                                                const todayDate = new Date();
+                                                
+                                                plansSnapshot.forEach(planSnapshot => {
+                                                    const plan = planSnapshot.val();
+                                                    if (!plan.actions) return;
+                                                    
+                                                    plan.actions.forEach(action => {
+                                                        if (action.status !== 'Concluído' && action.endDate) {
+                                                            const endDate = new Date(action.endDate);
+                                                            if (endDate < todayDate) {
+                                                                lateActions.push({
+                                                                    planTitle: plan.title,
+                                                                    activity: action.activity,
+                                                                    responsible: action.responsible,
+                                                                    endDate: formatDate(action.endDate),
+                                                                    daysLate: Math.floor((todayDate - endDate) / (1000 * 60 * 60 * 24))
+                                                                });
+                                                            }
+                                                        }
+                                                    });
+                                                });
+
+                                                if (lateActions.length > 0) {
+                                                    // Atualizar badge de notificação
+                                                    updateNotificationBadge(lateActions.length);
+                                                    
+                                                    // Marcar como enviado hoje
+                                                    database.ref(`last_notification_sent/${currentUser.uid}`).set(today);
+                                                    
+                                                    // Enviar notificações por email
+                                                    database.ref(`notification_emails/${currentUser.uid}`).once('value')
+                                                        .then((emailsSnapshot) => {
+                                                            if (!emailsSnapshot.exists()) return;
+                                                            
+                                                            // Construir mensagem
+                                                            let message = `<h2>Notificação de Ações Atrasadas</h2>`;
+                                                            message += `<p>Olá, ${userData.name}!</p>`;
+                                                            message += `<p>Você tem <strong>${lateActions.length} ações atrasadas</strong> no sistema:</p>`;
+                                                            message += `<ul>`;
+                                                            lateActions.forEach(action => {
+                                                                message += `<li><strong>${action.planTitle}</strong>: ${action.activity} (Responsável: ${action.responsible}, Atraso: ${action.daysLate} dias)</li>`;
+                                                            });
+                                                            message += `</ul>`;
+                                                            message += `<p>Acesse o sistema para atualizar o status dessas ações.</p>`;
+                                                            
+                                                            // Enviar para cada email cadastrado
+                                                            emailsSnapshot.forEach(emailSnap => {
+                                                                const data = emailSnap.val();
+                                                                const toEmail = typeof data === 'string' ? data : data.email;
+
+                                                                // Parâmetros para o e-mail
+                                                                const params = {
+                                                                    to_email: toEmail,
+                                                                    name: userData.name,
+                                                                    message: message
+                                                                };
+
+                                                                emailjs.send("service_98e468r", "template_mvgbfgp", params)
+                                                                    .then(() => {
+                                                                        // Registrar log
+                                                                        return database.ref('system_logs').push().set({
+                                                                            type: 'notification_sent',
+                                                                            userId: currentUser.uid,
+                                                                            userEmail: currentUser.email,
+                                                                            userName: userData.name,
+                                                                            timestamp: firebase.database.ServerValue.TIMESTAMP,
+                                                                            details: `Notificação automática enviada para ${toEmail} com ${lateActions.length} ações atrasadas`,
+                                                                            recipient: toEmail
+                                                                        });
+                                                                    })
+                                                                    .catch(error => {
+                                                                        console.error("Erro ao enviar notificação para", toEmail, error);
+                                                                    });
+                                                            });
+                                                        });
+                                                }
+                                            });
+                                    }
+                                });
+                        }
+                    });
+            }
+
+            // Verificar solicitações pendentes de administração
+            function checkForAdminRequests() {
+                if (!currentUser || !(userData.userType === 'admin' || userData.isAdmin)) return;
+                
+                database.ref('admin_requests').orderByChild('status').equalTo('pending').once('value')
+                    .then((snapshot) => {
+                        let pendingCount = 0;
+                        
+                        if (snapshot.exists()) {
+                            snapshot.forEach(() => {
+                                pendingCount++;
+                            });
+                        }
+                        
+                        updateAdminBadge(pendingCount);
+                    });
+            }
+
+            // Iniciar verificação periódica de notificações
+            function startNotificationCheck() {
+                // Verificar a cada minuto
+                notificationCheckInterval = setInterval(checkForNotifications, 60000);
+                // Verificar imediatamente ao carregar
+                checkForNotifications();
+            }
+
+            // Iniciar verificação periódica de solicitações de administração
+            function startAdminCheck() {
+                // Verificar a cada 5 minutos
+                adminCheckInterval = setInterval(checkForAdminRequests, 300000);
+                // Verificar imediatamente ao carregar
+                checkForAdminRequests();
+            }
+
+            // Parar verificação de notificações
+            function stopNotificationCheck() {
+                if (notificationCheckInterval) {
+                    clearInterval(notificationCheckInterval);
+                }
+            }
+
+            // Parar verificação de solicitações de administração
+            function stopAdminCheck() {
+                if (adminCheckInterval) {
+                    clearInterval(adminCheckInterval);
+                }
+            }
+
+            // Atualizar badge de notificação
+            function updateNotificationBadge(count) {
+                if (count > 0) {
+                    notificationBadge.textContent = count;
+                    notificationBadge.classList.remove('d-none');
+                } else {
+                    notificationBadge.classList.add('d-none');
+                }
+            }
+            
+            // Atualizar badge de administração
+            function updateAdminBadge(count) {
+                if (count > 0) {
+                    pendingRequestsBadge.textContent = count;
+                    document.getElementById('admin-badge').textContent = count;
+                    document.getElementById('admin-badge').classList.remove('d-none');
+                } else {
+                    document.getElementById('admin-badge').classList.add('d-none');
+                    pendingRequestsBadge.textContent = '0';
+                }
+            }
+
+            // Funções auxiliares
+            function formatDate(dateString) {
+                if (!dateString) return 'Não definido';
+                try {
+                    const date = new Date(dateString);
+                    return date.toLocaleDateString('pt-BR');
+                } catch (e) {
+                    return dateString; // Retorna o valor original se não puder ser convertido
+                }
+            }
+
+            function getPriorityBadgeClass(priority) {
+                switch (priority) {
+                    case 'Baixa': return 'bg-secondary';
+                    case 'Média': return 'bg-primary';
+                    case 'Alta': return 'bg-warning text-dark';
+                    case 'Crítica': return 'bg-danger';
+                    default: return 'bg-secondary';
+                }
+            }
+
+            function getStatusBadgeClass(status) {
+                switch (status) {
+                    case 'Não Iniciado': return 'bg-secondary';
+                    case 'Em Andamento': return 'bg-primary';
+                    case 'Concluído': return 'bg-success';
+                    case 'Cancelado': return 'bg-danger';
+                    default: return 'bg-secondary';
+                }
+            }
+
+            // Eventos de filtro e busca
+            planFilter.addEventListener('change', loadActionsTable);
+            actionStatusFilter.addEventListener('change', loadActionsTable);
+            actionAreaFilter.addEventListener('change', loadActionsTable);
+            actionUnitFilter.addEventListener('change', loadActionsTable);
+            searchActionsInput.addEventListener('input', loadActionsTable);
+            
+            managePlanFilter.addEventListener('change', loadManageActions);
+            statusFilter.addEventListener('change', loadManageActions);
+            manageAreaFilter.addEventListener('change', loadManageActions);
+            manageUnitFilter.addEventListener('change', loadManageActions);
+            searchManageActionsInput.addEventListener('input', loadManageActions);
+            
+            dashboardPlanFilter.addEventListener('change', loadDashboardData);
+            dashboardAreaFilter.addEventListener('change', loadDashboardData);
+            dashboardUnitFilter.addEventListener('change', loadDashboardData);
+            
+            plansAreaFilter.addEventListener('change', loadPlansTable);
+            plansUnitFilter.addEventListener('change', loadPlansTable);
+            searchPlansInput.addEventListener('input', loadPlansTable);
+
+            // Verificar estado de autenticação ao carregar a página
+            // Substitua o código atual por algo como:
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        // Apenas armazene o usuário, mas não redirecione
+        currentUser = user;
+        console.log('Usuário detectado, mas não redirecionando automaticamente');
+        
+        // Opcional: mostrar um botão "Continuar como [email]"
+        showLoginOption(user.email);
+    } else {
+        currentUser = null;
+        userData = null;
+    }
+});
+
+function showLoginOption(email) {
+    // Implemente uma UI para permitir que o usuário escolha continuar ou não
+}
+            });
+// Menu hamburguer para mobile
+document.addEventListener('DOMContentLoaded', function() {
+  // Criar botão de toggle para o menu
+  const navbarToggler = document.createElement('button');
+  navbarToggler.className = 'navbar-toggler d-lg-none';
+  navbarToggler.innerHTML = '<i class="bi bi-list"></i>';
+  navbarToggler.style.position = 'fixed';
+  navbarToggler.style.top = '10px';
+  navbarToggler.style.left = '10px';
+  navbarToggler.style.zIndex = '1051';
+  navbarToggler.style.fontSize = '1.5rem';
+  navbarToggler.style.backgroundColor = 'rgba(255,255,255,0.8)';
+  navbarToggler.style.border = 'none';
+  navbarToggler.style.borderRadius = '50%';
+  navbarToggler.style.width = '40px';
+  navbarToggler.style.height = '40px';
+  navbarToggler.style.display = 'none'; // Escondido por padrão
+  
+  document.body.appendChild(navbarToggler);
+  
+  // Criar overlay para o menu
+  const menuOverlay = document.createElement('div');
+  menuOverlay.className = 'menu-overlay';
+  menuOverlay.style.position = 'fixed';
+  menuOverlay.style.top = '0';
+  menuOverlay.style.left = '0';
+  menuOverlay.style.width = '100%';
+  menuOverlay.style.height = '100%';
+  menuOverlay.style.backgroundColor = 'rgba(0,0,0,0.5)';
+  menuOverlay.style.zIndex = '1049';
+  menuOverlay.style.opacity = '0';
+  menuOverlay.style.visibility = 'hidden';
+  menuOverlay.style.transition = 'opacity 0.3s, visibility 0.3s';
+  document.body.appendChild(menuOverlay);
+  
+  // Mostrar/ocultar menu no mobile
+  navbarToggler.addEventListener('click', function() {
+    document.querySelector('.sidebar').classList.toggle('active');
+    menuOverlay.style.opacity = '1';
+    menuOverlay.style.visibility = 'visible';
+  });
+  
+  menuOverlay.addEventListener('click', function() {
+    document.querySelector('.sidebar').classList.remove('active');
+    menuOverlay.style.opacity = '0';
+    menuOverlay.style.visibility = 'hidden';
+  });
+  
+  // Ajustar visibilidade do botão de toggle
+  function handleResponsive() {
+    if (window.innerWidth <= 768) {
+      navbarToggler.style.display = 'flex';
+      navbarToggler.style.alignItems = 'center';
+      navbarToggler.style.justifyContent = 'center';
+      document.querySelector('.sidebar').classList.remove('active');
+      menuOverlay.style.opacity = '0';
+      menuOverlay.style.visibility = 'hidden';
+    } else {
+      navbarToggler.style.display = 'none';
+      document.querySelector('.sidebar').classList.add('active');
+    }
+  }
+  
+  // Verificar no carregamento e no redimensionamento
+  window.addEventListener('load', handleResponsive);
+  window.addEventListener('resize', handleResponsive);
+  
+  // Ajustar modais para mobile
+  const modals = document.querySelectorAll('.modal');
+  modals.forEach(modal => {
+    modal.addEventListener('shown.bs.modal', function() {
+      if (window.innerWidth <= 576) {
+        modal.querySelector('.modal-dialog').classList.add('modal-fullscreen');
+      }
+    });
+  });
+  
+  // Ajustar inputs para mobile
+  const inputs = document.querySelectorAll('input, select, textarea');
+  inputs.forEach(input => {
+    input.addEventListener('focus', function() {
+      if (window.innerWidth <= 768) {
+        setTimeout(() => {
+          this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+      }
+    });
+  });
+});
+    </script>
+</body>
+</html>
