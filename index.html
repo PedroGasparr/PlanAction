@@ -148,6 +148,10 @@
                             <span id="admin-badge" class="badge bg-danger notification-badge d-none">0</span>
                         </a>
                     </li>
+                    <a class="nav-link" href="#" data-section="edit-plan">
+                        <i class="bi bi-pencil-square"></i> Editar Planos
+                    </a>
+                    
                     <li class="nav-item mt-4">
                         <a class="nav-link text-danger" href="#" id="logout-btn">
                             <i class="bi bi-box-arrow-right"></i> Sair
@@ -677,6 +681,239 @@
                         </div>
                     </div>
                 </div>
+                <!-- Adicione esta nova seção após a seção de Administração existente -->
+<div id="edit-plan-section" class="d-none">
+    <h2 class="mb-4">Editar Planos e Ações</h2>
+    <div class="card">
+        <div class="card-body">
+            <div class="mb-3 row">
+                <div class="col-md-6">
+                    <label for="edit-plan-filter" class="form-label">Selecionar Plano:</label>
+                    <select id="edit-plan-filter" class="form-select">
+                        <option value="">Selecione um plano...</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="edit-plan-status-filter" class="form-label">Status:</label>
+                    <select id="edit-plan-status-filter" class="form-select">
+                        <option value="">Todos</option>
+                        <option value="Ativo">Ativo</option>
+                        <option value="Concluído">Concluído</option>
+                        <option value="Cancelado">Cancelado</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="edit-plan-area-filter" class="form-label">Área:</label>
+                    <select id="edit-plan-area-filter" class="form-select">
+                        <option value="">Todas</option>
+                        <option value="Segurança do Trabalho">Segurança do Trabalho</option>
+                        <option value="Gerência">Gerência</option>
+                        <option value="Coordenação">Coordenação</option>
+                        <option value="Limpeza">Limpeza</option>
+                        <option value="Operação">Operação</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div id="edit-plan-container" class="d-none">
+                <form id="edit-plan-form">
+                    <input type="hidden" id="edit-plan-id">
+                    
+                    <div class="form-section">
+                        <h5 class="form-title">Informações Básicas do Plano</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="edit-plan-title" class="form-label">Título do Plano*</label>
+                                <input type="text" class="form-control" id="edit-plan-title" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit-plan-type" class="form-label">Tipo*</label>
+                                <select class="form-select" id="edit-plan-type" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="Estratégico">Estratégico</option>
+                                    <option value="Tático">Tático</option>
+                                    <option value="Operacional">Operacional</option>
+                                    <option value="Melhoria">Melhoria</option>
+                                    <option value="Corretivo">Corretivo</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label for="edit-plan-area" class="form-label">Área*</label>
+                                <select class="form-select" id="edit-plan-area" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="Segurança do Trabalho">Segurança do Trabalho</option>
+                                    <option value="Gerência">Gerência</option>
+                                    <option value="Coordenação">Coordenação</option>
+                                    <option value="Limpeza">Limpeza</option>
+                                    <option value="Operação">Operação</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit-plan-unit" class="form-label">Unidade*</label>
+                                <select class="form-select" id="edit-plan-unit" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="Fábrica Belém">Fábrica Belém</option>
+                                    <option value="Fábrica Suzano">Fábrica Suzano</option>
+                                    <option value="Fábrica Suzano Mogi Das Cruzes">Fábrica Suzano Mogi Das Cruzes</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <label for="edit-plan-description" class="form-label">Descrição do Plano</label>
+                                <textarea class="form-control" id="edit-plan-description" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <label for="edit-plan-status" class="form-label">Status do Plano</label>
+                                <select class="form-select" id="edit-plan-status">
+                                    <option value="Ativo">Ativo</option>
+                                    <option value="Concluído">Concluído</option>
+                                    <option value="Cancelado">Cancelado</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section mt-4">
+                        <h5 class="form-title">Ações do Plano</h5>
+                        <div id="edit-action-items-container">
+                            <!-- Ações serão adicionadas aqui dinamicamente -->
+                        </div>
+                        <!-- <button type="button" id="add-edit-action-btn" class="btn btn-secondary mt-3">
+                            <i class="bi bi-plus-circle"></i> Adicionar Nova Ação
+                        </button> -->
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-4">
+                        <!-- <button type="button" id="delete-plan-btn" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Excluir Plano
+                        </button> -->
+                        <div>
+                            <button type="button" id="cancel-edit-plan-btn" class="btn btn-secondary me-2">
+                                <i class="bi bi-x-circle"></i> Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-save"></i> Salvar Alterações
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div id="no-plan-selected-message" class="text-center py-5">
+                <i class="bi bi-file-earmark-text" style="font-size: 3rem; color: #6c757d;"></i>
+                <h5 class="mt-3">Selecione um plano para editar</h5>
+                <p class="text-muted">Escolha um plano na lista acima para visualizar e editar suas informações</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Adicione este template para ações editáveis -->
+<template id="edit-action-item-template">
+    <div class="action-item-form mb-4 p-3 border rounded">
+        <input type="hidden" class="action-id">
+        <div class="row">
+            <div class="col-md-12">
+                <label class="form-label">Objetivo Estratégico*</label>
+                <input type="text" class="form-control objective" required>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-12">
+                <label class="form-label">Atividade*</label>
+                <input type="text" class="form-control activity" required>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-12">
+                <label class="form-label">Why - Porque?*</label>
+                <textarea class="form-control why" rows="2" required></textarea>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-12">
+                <label class="form-label">How - Como?*</label>
+                <textarea class="form-control how" rows="2" required></textarea>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-6">
+                <label class="form-label">Responsável*</label>
+                <input type="text" class="form-control responsible" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Executor*</label>
+                <input type="text" class="form-control executor" required>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-6">
+                <label class="form-label">Data Início*</label>
+                <input type="date" class="form-control start-date" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Data Fim*</label>
+                <input type="date" class="form-control end-date" required>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-12">
+                <label class="form-label">Where - Onde?*</label>
+                <input type="text" class="form-control where" required>
+            </div>
+        </div>
+        <div class="row mt-2">
+            <div class="col-md-6">
+                <label class="form-label">Prioridade*</label>
+                <select class="form-select priority">
+                    <option value="Baixa">Baixa</option>
+                    <option value="Média">Média</option>
+                    <option value="Alta">Alta</option>
+                    <option value="Crítica">Crítica</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Status*</label>
+                <select class="form-select status">
+                    <option value="Não Iniciado">Não Iniciado</option>
+                    <option value="Em Andamento">Em Andamento</option>
+                    <option value="Concluído">Concluído</option>
+                    <option value="Cancelado">Cancelado</option>
+                </select>
+            </div>
+        </div>
+        <div class="text-end mt-2">
+            <button type="button" class="btn btn-sm btn-danger remove-action-btn">
+                <i class="bi bi-trash"></i> Remover Ação
+            </button>
+        </div>
+    </div>
+</template>
+
+<!-- Adicione este modal para confirmar exclusão -->
+<div class="modal fade" id="confirm-delete-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">Confirmar Exclusão</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir este plano permanentemente? Esta ação não pode ser desfeita.</p>
+                <p class="fw-bold">Todos os dados e ações associadas serão perdidos.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" id="confirm-delete-btn" class="btn btn-danger">Excluir Permanentemente</button>
+            </div>
+        </div>
+    </div>
+</div>
 
                 <!-- Template para uma ação (usado pelo JavaScript) -->
                 <template id="action-item-template">
@@ -843,6 +1080,389 @@
         emailjs.init("lYRk8TyBCvr1Kx0Hx");
     </script>        
     <script>
+
+
+
+
+
+
+// Adicione o item de menu na sidebar (acima do botão Sair)
+const editPlanMenuItem = document.createElement('li');
+editPlanMenuItem.className = 'nav-item';
+
+// Corrigindo a seleção do item de logout - com verificação de existência
+const logoutLink = document.querySelector('.nav-item a[data-section="logout"]');
+if (logoutLink) {
+    const logoutItem = logoutLink.closest('.nav-item');
+    if (logoutItem) {
+        logoutItem.parentNode.insertBefore(editPlanMenuItem, logoutItem);
+    } else {
+        // Se não encontrar o item de logout, adiciona no final da lista
+        document.querySelector('.sidebar .nav').appendChild(editPlanMenuItem);
+    }
+} else {
+    // Se não encontrar o link de logout, adiciona no final da lista
+    document.querySelector('.sidebar .nav').appendChild(editPlanMenuItem);
+}
+// Elementos da seção de edição
+const editPlanFilter = document.getElementById('edit-plan-filter');
+const editPlanStatusFilter = document.getElementById('edit-plan-status-filter');
+const editPlanAreaFilter = document.getElementById('edit-plan-area-filter');
+const editPlanContainer = document.getElementById('edit-plan-container');
+const noPlanSelectedMessage = document.getElementById('no-plan-selected-message');
+const editPlanForm = document.getElementById('edit-plan-form');
+const editPlanIdInput = document.getElementById('edit-plan-id');
+const editPlanTitle = document.getElementById('edit-plan-title');
+const editPlanType = document.getElementById('edit-plan-type');
+const editPlanArea = document.getElementById('edit-plan-area');
+const editPlanUnit = document.getElementById('edit-plan-unit');
+const editPlanDescription = document.getElementById('edit-plan-description');
+const editPlanStatus = document.getElementById('edit-plan-status');
+const editActionItemsContainer = document.getElementById('edit-action-items-container');
+const editActionItemTemplate = document.getElementById('edit-action-item-template');
+const deletePlanBtn = document.getElementById('delete-plan-btn');
+const cancelEditPlanBtn = document.getElementById('cancel-edit-plan-btn');
+const confirmDeleteModal = document.getElementById('confirm-delete-modal') ? new bootstrap.Modal(document.getElementById('confirm-delete-modal')) : null;
+const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+
+// Carregar filtros de planos
+function loadEditPlanFilters() {
+    if (!editPlanFilter) return;
+    
+    editPlanFilter.innerHTML = '<option value="">Selecione um plano...</option>';
+    
+    database.ref('plans').once('value')
+        .then((snapshot) => {
+            if (!snapshot.exists()) return;
+            
+            snapshot.forEach(planSnapshot => {
+                const plan = planSnapshot.val();
+                const option = document.createElement('option');
+                option.value = planSnapshot.key;
+                option.textContent = plan.title;
+                editPlanFilter.appendChild(option);
+            });
+        });
+}
+
+// Selecionar plano para edição
+if (editPlanFilter) {
+    editPlanFilter.addEventListener('change', function() {
+        const planId = this.value;
+        
+        if (!planId) {
+            if (editPlanContainer) editPlanContainer.classList.add('d-none');
+            if (noPlanSelectedMessage) noPlanSelectedMessage.classList.remove('d-none');
+            return;
+        }
+        
+        database.ref('plans/' + planId).once('value')
+            .then((snapshot) => {
+                const plan = snapshot.val();
+                if (!plan) {
+                    alert('Plano não encontrado!');
+                    if (editPlanFilter) editPlanFilter.value = '';
+                    return;
+                }
+                
+                // Preencher informações básicas do plano
+                if (editPlanIdInput) editPlanIdInput.value = planId;
+                if (editPlanTitle) editPlanTitle.value = plan.title;
+                if (editPlanType) editPlanType.value = plan.type;
+                if (editPlanArea) editPlanArea.value = plan.area;
+                if (editPlanUnit) editPlanUnit.value = plan.unit;
+                if (editPlanDescription) editPlanDescription.value = plan.description || '';
+                if (editPlanStatus) editPlanStatus.value = plan.status || 'Ativo';
+                
+                // Limpar ações existentes
+                if (editActionItemsContainer) editActionItemsContainer.innerHTML = '';
+                
+                // Adicionar ações do plano
+                if (plan.actions && plan.actions.length > 0 && editActionItemsContainer && editActionItemTemplate) {
+                    plan.actions.forEach((action, index) => {
+                        const actionItem = editActionItemTemplate.content.cloneNode(true);
+                        const actionElement = actionItem.querySelector('.action-item-form');
+                        
+                        // Preencher todos os campos da ação
+                        actionElement.querySelector('.objective').value = action.objective || '';
+                        actionElement.querySelector('.activity').value = action.activity || '';
+                        actionElement.querySelector('.why').value = action.why || '';
+                        actionElement.querySelector('.how').value = action.how || '';
+                        actionElement.querySelector('.responsible').value = action.responsible || '';
+                        actionElement.querySelector('.executor').value = action.executor || '';
+                        actionElement.querySelector('.start-date').value = action.startDate || '';
+                        actionElement.querySelector('.end-date').value = action.endDate || '';
+                        actionElement.querySelector('.where').value = action.where || '';
+                        actionElement.querySelector('.priority').value = action.priority || 'Média';
+                        actionElement.querySelector('.status').value = action.status || 'Não Iniciado';
+                        
+                        // Adicionar evento para remover ação (desabilitado)
+                        const removeBtn = actionElement.querySelector('.remove-action-btn');
+                        if (removeBtn) {
+                            removeBtn.disabled = true;
+                            removeBtn.title = "Não é possível remover ações existentes";
+                        }
+                        
+                        editActionItemsContainer.appendChild(actionItem);
+                    });
+                    
+                    if (editPlanContainer) editPlanContainer.classList.remove('d-none');
+                    if (noPlanSelectedMessage) noPlanSelectedMessage.classList.add('d-none');
+                } else {
+                    alert('Este plano não possui ações para editar.');
+                    if (editPlanFilter) editPlanFilter.value = '';
+                    if (editPlanContainer) editPlanContainer.classList.add('d-none');
+                    if (noPlanSelectedMessage) noPlanSelectedMessage.classList.remove('d-none');
+                }
+            })
+            .catch(error => {
+                alert('Erro ao carregar plano: ' + error.message);
+                if (editPlanFilter) editPlanFilter.value = '';
+            });
+    });
+}
+
+// Salvar alterações no plano
+if (editPlanForm) {
+    editPlanForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (!currentUser) {
+            alert('Você precisa estar logado para editar planos!');
+            return;
+        }
+        
+        const planId = editPlanIdInput ? editPlanIdInput.value : null;
+        if (!planId) {
+            alert('Nenhum plano selecionado para edição!');
+            return;
+        }
+        
+        const title = editPlanTitle ? editPlanTitle.value.trim() : '';
+        const type = editPlanType ? editPlanType.value : '';
+        const area = editPlanArea ? editPlanArea.value : '';
+        const unit = editPlanUnit ? editPlanUnit.value : '';
+        const description = editPlanDescription ? editPlanDescription.value.trim() : '';
+        const status = editPlanStatus ? editPlanStatus.value : '';
+        
+        if (!title) {
+            alert('O título do plano é obrigatório!');
+            return;
+        }
+        
+        const actionItems = [];
+        if (editActionItemsContainer) {
+            document.querySelectorAll('#edit-action-items-container .action-item-form').forEach(item => {
+                actionItems.push({
+                    objective: item.querySelector('.objective').value.trim(),
+                    activity: item.querySelector('.activity').value.trim(),
+                    why: item.querySelector('.why').value.trim(),
+                    how: item.querySelector('.how').value.trim(),
+                    responsible: item.querySelector('.responsible').value.trim(),
+                    executor: item.querySelector('.executor').value.trim(),
+                    startDate: item.querySelector('.start-date').value,
+                    endDate: item.querySelector('.end-date').value,
+                    where: item.querySelector('.where').value.trim(),
+                    priority: item.querySelector('.priority').value,
+                    status: item.querySelector('.status').value,
+                    completed: item.querySelector('.status').value === 'Concluído'
+                });
+            });
+        }
+        
+        if (actionItems.length === 0) {
+            alert('O plano deve ter pelo menos uma ação!');
+            return;
+        }
+        
+        // Validar datas das ações
+        for (const action of actionItems) {
+            if (new Date(action.endDate) < new Date(action.startDate)) {
+                alert('A data de término não pode ser anterior à data de início em nenhuma ação!');
+                return;
+            }
+        }
+        
+        const submitBtn = editPlanForm.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Salvando...';
+        }
+        
+        const updates = {
+            title: title,
+            type: type,
+            area: area,
+            unit: unit,
+            description: description,
+            status: status,
+            actions: actionItems,
+            updatedAt: firebase.database.ServerValue.TIMESTAMP,
+            updatedBy: currentUser.uid,
+            updatedByName: userData.name
+        };
+        
+        database.ref('plans/' + planId).update(updates)
+            .then(() => {
+                // Registrar log
+                return database.ref('system_logs').push().set({
+                    type: 'plan_updated',
+                    userId: currentUser.uid,
+                    userEmail: currentUser.email,
+                    userName: userData.name,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                    details: `Plano "${title}" atualizado`,
+                    planId: planId
+                });
+            })
+            .then(() => {
+                alert('Plano atualizado com sucesso!');
+                if (typeof loadDashboardData === 'function') loadDashboardData();
+                if (typeof loadPlansTable === 'function') loadPlansTable();
+                if (typeof loadActionsTable === 'function') loadActionsTable();
+                if (typeof loadManageActions === 'function') loadManageActions();
+            })
+            .catch(error => {
+                alert('Erro ao atualizar plano: ' + error.message);
+            })
+            .finally(() => {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="bi bi-save"></i> Salvar Alterações';
+                }
+            });
+    });
+}
+
+// Cancelar edição
+if (cancelEditPlanBtn) {
+    cancelEditPlanBtn.addEventListener('click', function() {
+        const submitBtn = editPlanForm ? editPlanForm.querySelector('button[type="submit"]') : null;
+        if (!submitBtn || !submitBtn.disabled || 
+            confirm('Tem certeza que deseja cancelar as alterações? Todas as mudanças não salvas serão perdidas.')) {
+            if (editPlanFilter) editPlanFilter.value = '';
+            if (editPlanContainer) editPlanContainer.classList.add('d-none');
+            if (noPlanSelectedMessage) noPlanSelectedMessage.classList.remove('d-none');
+        }
+    });
+}
+
+// Solicitar exclusão do plano
+if (deletePlanBtn) {
+    deletePlanBtn.addEventListener('click', function() {
+        const planId = editPlanIdInput ? editPlanIdInput.value : null;
+        if (!planId) {
+            alert('Nenhum plano selecionado para exclusão!');
+            return;
+        }
+        
+        database.ref('plans/' + planId).once('value')
+            .then((snapshot) => {
+                const plan = snapshot.val();
+                if (!plan) {
+                    alert('Plano não encontrado!');
+                    return;
+                }
+                
+                // Atualizar mensagem no modal de confirmação
+                const deletePlanTitle = document.getElementById('delete-plan-title');
+                if (deletePlanTitle) deletePlanTitle.textContent = plan.title;
+                if (confirmDeleteModal) confirmDeleteModal.show();
+                
+                // Configurar botão de confirmação
+                if (confirmDeleteBtn) {
+                    confirmDeleteBtn.onclick = function() {
+                        confirmDeleteBtn.disabled = true;
+                        confirmDeleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Excluindo...';
+                        
+                        database.ref('plans/' + planId).remove()
+                            .then(() => {
+                                // Registrar log
+                                return database.ref('system_logs').push().set({
+                                    type: 'plan_deleted',
+                                    userId: currentUser.uid,
+                                    userEmail: currentUser.email,
+                                    userName: userData.name,
+                                    timestamp: firebase.database.ServerValue.TIMESTAMP,
+                                    details: `Plano "${plan.title}" excluído`,
+                                    planId: planId
+                                });
+                            })
+                            .then(() => {
+                                alert('Plano excluído com sucesso!');
+                                if (confirmDeleteModal) confirmDeleteModal.hide();
+                                if (editPlanFilter) editPlanFilter.value = '';
+                                if (editPlanContainer) editPlanContainer.classList.add('d-none');
+                                if (noPlanSelectedMessage) noPlanSelectedMessage.classList.remove('d-none');
+                                
+                                // Recarregar outras seções
+                                if (typeof loadDashboardData === 'function') loadDashboardData();
+                                if (typeof loadPlansTable === 'function') loadPlansTable();
+                                if (typeof loadActionsTable === 'function') loadActionsTable();
+                                if (typeof loadManageActions === 'function') loadManageActions();
+                                loadEditPlanFilters();
+                            })
+                            .catch(error => {
+                                alert('Erro ao excluir plano: ' + error.message);
+                            })
+                            .finally(() => {
+                                if (confirmDeleteBtn) {
+                                    confirmDeleteBtn.disabled = false;
+                                    confirmDeleteBtn.innerHTML = 'Confirmar Exclusão';
+                                }
+                            });
+                    };
+                }
+            })
+            .catch(error => {
+                alert('Erro ao carregar plano: ' + error.message);
+            });
+    });
+}
+
+// Fechar modal ao clicar no botão Cancelar
+if (cancelDeleteBtn) {
+    cancelDeleteBtn.addEventListener('click', function() {
+        if (confirmDeleteModal) confirmDeleteModal.hide();
+    });
+}
+
+// Filtros
+if (editPlanStatusFilter) {
+    editPlanStatusFilter.addEventListener('change', loadEditPlanFilters);
+}
+if (editPlanAreaFilter) {
+    editPlanAreaFilter.addEventListener('change', loadEditPlanFilters);
+}
+
+// Carregar filtros quando a seção for mostrada
+const editPlanNavLink = document.querySelector('.nav-link[data-section="edit-plan"]');
+if (editPlanNavLink) {
+    editPlanNavLink.addEventListener('click', function() {
+        loadEditPlanFilters();
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAkFlGBKrXhgpAtxaJBuV2AweWoIA9VzmU",

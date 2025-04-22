@@ -610,3 +610,17 @@ body {
     display: none !important;
   }
 }
+/* Estilos para a tabela de solicitações */
+#requests-table-body tr {
+  cursor: pointer;
+}
+
+/* Estilos para os badges de status */
+.badge.bg-warning.text-dark {
+  color: #212529 !important;
+}
+
+/* Ajustes para o modal de detalhes */
+#request-details-modal .modal-lg {
+  max-width: 800px;
+}
