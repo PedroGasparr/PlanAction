@@ -783,9 +783,9 @@
                         <div id="edit-action-items-container">
                             <!-- Ações serão adicionadas aqui dinamicamente -->
                         </div>
-                        <!-- <button type="button" id="add-edit-action-btn" class="btn btn-secondary mt-3">
+                         <button type="button" id="add-edit-action-btn" class="btn btn-secondary mt-3">
                             <i class="bi bi-plus-circle"></i> Adicionar Nova Ação
-                        </button> -->
+                        </button> 
                     </div>
 
                     <div class="d-flex justify-content-between mt-4">
@@ -1599,6 +1599,7 @@ if (editPlanNavLink) {
                     loadManageActions();
                 } else if (section === 'settings') {
                     loadNotificationSettings();
+                    addPlanNotificationSection();
                 } else if (section === 'admin') {
                     loadAdminRequests();
                     loadUsersTable();
@@ -3065,7 +3066,34 @@ responsibleChart = new Chart(responsibleCtx, {
                         });
                     });
             }
+            
 
+            // Adicionar nova ação durante a edição
+if (document.getElementById('add-edit-action-btn')) {
+    document.getElementById('add-edit-action-btn').addEventListener('click', function() {
+        if (!editActionItemTemplate || !editActionItemsContainer) {
+            console.error('Elementos necessários para adicionar ação não encontrados');
+            return;
+        }
+
+        const actionItem = editActionItemTemplate.content.cloneNode(true);
+        const actionElement = actionItem.querySelector('.action-item-form');
+        
+        // Habilitar botão de remoção para novas ações (não para as existentes)
+        const removeBtn = actionElement.querySelector('.remove-action-btn');
+        if (removeBtn) {
+            removeBtn.disabled = false;
+            removeBtn.title = "Remover esta ação";
+            removeBtn.addEventListener('click', function() {
+                if (confirm('Tem certeza que deseja remover esta ação?')) {
+                    this.closest('.action-item-form').remove();
+                }
+            });
+        }
+        
+        editActionItemsContainer.appendChild(actionItem);
+    });
+}
             // Carregar solicitações de administração
             function loadAdminRequests() {
                 if (!currentUser || !(userData.userType === 'admin' || userData.isAdmin)) return;
@@ -3138,6 +3166,259 @@ responsibleChart = new Chart(responsibleCtx, {
                     });
             }
             
+
+            // Adicionar seção de notificação por plano
+function addPlanNotificationSection() {
+    const notificationSection = document.getElementById('notification-section');
+    if (!notificationSection) return;
+
+    // Criar container para seleção de planos
+    const planNotificationContainer = document.createElement('div');
+    planNotificationContainer.className = 'card mb-4';
+    planNotificationContainer.innerHTML = `
+        <div class="card-header">
+            <h5 class="mb-0">Notificação por Plano de Ação</h5>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label for="notification-plan-select" class="form-label">Selecione um Plano de Ação:</label>
+                <select id="notification-plan-select" class="form-select">
+                    <option value="">Carregando planos...</option>
+                </select>
+            </div>
+            <div id="plan-notification-details" class="d-none">
+                <h6 class="mt-4">Detalhes do Plano</h6>
+                <div id="plan-notification-info" class="mb-3"></div>
+                
+                <h6 class="mt-4">Ações Pendentes</h6>
+                <div id="plan-notification-actions" class="mb-3"></div>
+                
+                <button id="send-plan-notification-btn" class="btn btn-primary">
+                    <i class="bi bi-envelope"></i> Enviar Notificação
+                </button>
+            </div>
+        </div>
+    `;
+    notificationSection.appendChild(planNotificationContainer);
+
+    // Carregar planos não concluídos no select
+    loadNotificationPlans();
+
+    // Configurar evento de seleção de plano
+    document.getElementById('notification-plan-select').addEventListener('change', function() {
+        const planId = this.value;
+        if (!planId) {
+            document.getElementById('plan-notification-details').classList.add('d-none');
+            return;
+        }
+        loadPlanNotificationDetails(planId);
+    });
+
+    // Configurar botão de envio
+    document.getElementById('send-plan-notification-btn').addEventListener('click', sendPlanNotification);
+}
+
+// Carregar planos não concluídos para notificação
+function loadNotificationPlans() {
+    const planSelect = document.getElementById('notification-plan-select');
+    if (!planSelect) return;
+
+    database.ref('plans').once('value')
+        .then((snapshot) => {
+            planSelect.innerHTML = '<option value="">Selecione um plano...</option>';
+            
+            if (!snapshot.exists()) {
+                planSelect.innerHTML = '<option value="">Nenhum plano encontrado</option>';
+                return;
+            }
+
+            snapshot.forEach(planSnapshot => {
+                const plan = planSnapshot.val();
+                // Mostrar apenas planos não concluídos
+                if (plan.status !== 'Concluído') {
+                    const option = document.createElement('option');
+                    option.value = planSnapshot.key;
+                    option.textContent = plan.title;
+                    planSelect.appendChild(option);
+                }
+            });
+        });
+}
+
+// Carregar detalhes do plano selecionado
+function loadPlanNotificationDetails(planId) {
+    const detailsContainer = document.getElementById('plan-notification-details');
+    const infoContainer = document.getElementById('plan-notification-info');
+    const actionsContainer = document.getElementById('plan-notification-actions');
+    
+    detailsContainer.classList.add('d-none');
+    infoContainer.innerHTML = 'Carregando...';
+    actionsContainer.innerHTML = '';
+
+    database.ref('plans/' + planId).once('value')
+        .then((snapshot) => {
+            const plan = snapshot.val();
+            if (!plan) {
+                infoContainer.innerHTML = 'Plano não encontrado';
+                return;
+            }
+
+            // Mostrar informações básicas do plano
+            infoContainer.innerHTML = `
+                <p><strong>Título:</strong> ${plan.title}</p>
+                <p><strong>Área:</strong> ${plan.area}</p>
+                <p><strong>Unidade:</strong> ${plan.unit}</p>
+                <p><strong>Status:</strong> ${plan.status}</p>
+                <p><strong>Descrição:</strong> ${plan.description || 'Nenhuma descrição'}</p>
+            `;
+
+            // Mostrar ações pendentes
+            if (!plan.actions || plan.actions.length === 0) {
+                actionsContainer.innerHTML = '<p>Nenhuma ação encontrada neste plano.</p>';
+            } else {
+                const pendingActions = plan.actions.filter(action => 
+                    action.status !== 'Concluído' && action.status !== 'Cancelado'
+                );
+
+                if (pendingActions.length === 0) {
+                    actionsContainer.innerHTML = '<p>Todas as ações deste plano estão concluídas ou canceladas.</p>';
+                } else {
+                    let actionsHTML = '<ul class="list-group">';
+                    pendingActions.forEach((action, index) => {
+                        const endDate = action.endDate ? new Date(action.endDate) : null;
+                        const isLate = endDate && endDate < new Date();
+                        
+                        actionsHTML += `
+                            <li class="list-group-item">
+                                <h6>Ação ${index + 1}: ${action.activity}</h6>
+                                <p><strong>Responsável:</strong> ${action.responsible}</p>
+                                <p><strong>Prazo:</strong> ${formatDate(action.endDate)} 
+                                    ${isLate ? '<span class="badge bg-danger">Atrasado</span>' : ''}
+                                </p>
+                                <p><strong>Status:</strong> ${action.status}</p>
+                            </li>
+                        `;
+                    });
+                    actionsHTML += '</ul>';
+                    actionsContainer.innerHTML = actionsHTML;
+                }
+            }
+
+            detailsContainer.classList.remove('d-none');
+        });
+}
+
+// Enviar notificação para o plano selecionado
+function sendPlanNotification() {
+    const planId = document.getElementById('notification-plan-select').value;
+    if (!planId || !currentUser) return;
+
+    const btn = document.getElementById('send-plan-notification-btn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Enviando...';
+
+    // Primeiro, obter os emails cadastrados
+    database.ref(`notification_emails/${currentUser.uid}`).once('value')
+        .then((emailsSnapshot) => {
+            if (!emailsSnapshot.exists()) {
+                throw new Error('Nenhum email cadastrado para notificação');
+            }
+
+            // Obter detalhes do plano
+            return Promise.all([
+                emailsSnapshot,
+                database.ref('plans/' + planId).once('value')
+            ]);
+        })
+        .then(([emailsSnapshot, planSnapshot]) => {
+            const plan = planSnapshot.val();
+            if (!plan) {
+                throw new Error('Plano não encontrado');
+            }
+
+            // Filtrar apenas ações pendentes
+            const pendingActions = plan.actions ? 
+                plan.actions.filter(action => 
+                    action.status !== 'Concluído' && action.status !== 'Cancelado'
+                ) : [];
+
+            if (pendingActions.length === 0) {
+                throw new Error('Nenhuma ação pendente neste plano');
+            }
+
+            // Construir mensagem do email
+            let message = `<h2>Notificação do Plano: ${plan.title}</h2>`;
+            message += `<p>Olá, ${userData.name}!</p>`;
+            message += `<p>Aqui está o status atual do plano <strong>${plan.title}</strong>:</p>`;
+            
+            message += `<h3 class="mt-4">Ações Pendentes</h3>`;
+            message += `<ul>`;
+            
+            pendingActions.forEach((action, index) => {
+                const endDate = action.endDate ? new Date(action.endDate) : null;
+                const isLate = endDate && endDate < new Date();
+                const daysLate = isLate ? Math.floor((new Date() - endDate) / (1000 * 60 * 60 * 24)) : 0;
+                
+                message += `<li>
+                    <strong>${action.activity}</strong>
+                    <p>Responsável: ${action.responsible}</p>
+                    <p>Prazo: ${formatDate(action.endDate)} ${isLate ? `(Atrasado ${daysLate} dias)` : ''}</p>
+                    <p>Status: ${action.status}</p>
+                </li>`;
+            });
+            
+            message += `</ul>`;
+            message += `<p class="mt-3">Acesse o sistema para atualizar o status deste plano.</p>`;
+
+            // Enviar para cada email cadastrado
+            const sendPromises = [];
+            
+            emailsSnapshot.forEach(emailSnap => {
+                const data = emailSnap.val();
+                const toEmail = typeof data === 'string' ? data : data.email;
+
+                const params = {
+                    to_email: toEmail,
+                    name: userData.name,
+                    message: message,
+                    subject: `Atualização do Plano: ${plan.title}`
+                };
+
+                sendPromises.push(
+                    emailjs.send("service_98e468r", "template_mvgbfgp", params)
+                        .then(() => {
+                            // Registrar log para cada email enviado
+                            return database.ref('system_logs').push().set({
+                                type: 'plan_notification_sent',
+                                userId: currentUser.uid,
+                                userEmail: currentUser.email,
+                                userName: userData.name,
+                                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                                details: `Notificação do plano ${plan.title} enviada para ${toEmail}`,
+                                planId: planId,
+                                recipient: toEmail,
+                                actionsCount: pendingActions.length
+                            });
+                        })
+                );
+            });
+
+            return Promise.all(sendPromises);
+        })
+        .then(() => {
+            alert('Notificação enviada com sucesso para todos os emails cadastrados!');
+        })
+        .catch(error => {
+            alert('Erro ao enviar notificação: ' + error.message);
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        });
+}
+
+
             // Processar solicitação de administração
             function processAdminRequest(requestId, approve) {
                 database.ref(`admin_requests/${requestId}`).once('value')

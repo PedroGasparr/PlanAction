@@ -624,3 +624,23 @@ body {
 #request-details-modal .modal-lg {
   max-width: 800px;
 }
+/* Adicione ao seu arquivo CSS existente */
+#plan-notification-details {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 5px;
+  border: 1px solid #dee2e6;
+}
+
+#plan-notification-actions .list-group-item {
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+#plan-notification-actions .list-group-item h6 {
+  color: #0d6efd;
+}
+
+#send-plan-notification-btn {
+  margin-top: 20px;
+}
