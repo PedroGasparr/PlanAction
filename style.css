@@ -644,3 +644,31 @@ body {
 #send-plan-notification-btn {
   margin-top: 20px;
 }
+/* Estilo para o botão flutuante */
+.floating-button {
+  position: fixed; /* 1. Posição fixa em relação à viewport */
+  bottom: 20px;    /* 2. Distância da parte inferior */
+  right: 20px;     /* 3. Distância da parte direita */
+  z-index: 1000;   /* 4. Garante que fique acima de outros elementos */
+
+  /* Estilos visuais do botão (cores, tamanho, forma, etc.) */
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  text-decoration: none;
+}
+
+.floating-button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
